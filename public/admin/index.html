@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="login-logo-text">KIA<span class="dot">.</span>ADMIN</span>
+      <span class="login-logo-sub">Hệ thống quản trị showroom</span>
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+
+    <form id="login-form" autocomplete="on">
+      <div class="login-form-group">
+        <label class="form-label" for="username">Tên đăng nhập</label>
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          placeholder="Nhập tên đăng nhập"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="login-form-group">
+        <label class="form-label" for="password">Mật khẩu</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          placeholder="Nhập mật khẩu"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="login-btn" id="login-btn">Đăng nhập</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  if (getToken()) {
+    location.href = 'dashboard.html';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn    = document.getElementById('login-btn');
+    const errEl  = document.getElementById('login-error');
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      errEl.textContent = 'Vui lòng nhập đầy đủ thông tin';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Đang đăng nhập...';
+    errEl.style.display = 'none';
+
+    const res = await API.login({ username, password });
+
+    if (res && res.ok && res.data && res.data.token) {
+      localStorage.setItem('admin_token', res.data.token);
+      location.href = 'dashboard.html';
+    } else {
+      const msg = (res && res.data && res.data.message)
+        ? res.data.message
+        : 'Sai tên đăng nhập hoặc mật khẩu';
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Đăng nhập';
+    }
+  });
+</script>
+
+</body>
+</html>

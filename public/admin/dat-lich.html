@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt lịch — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Đặt lịch</div>
+      <div class="page-subtitle">Quản lý lịch hẹn tư vấn của khách hàng</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Danh sách đặt lịch</div>
+      <div class="toolbar" style="margin-bottom:0">
+        <input type="text" class="search-input" id="search-input" placeholder="Tìm theo tên, số điện thoại...">
+        <select class="filter-select" id="filter-status">
+          <option value="">Tất cả trạng thái</option>
+          <option value="Chờ xử lý">Chờ xử lý</option>
+          <option value="Đã xác nhận">Đã xác nhận</option>
+          <option value="Hoàn thành">Hoàn thành</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="table-container">
+        <div class="loading"><div class="spinner"></div> Đang tải...</div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info" id="pagination-info"></div>
+      <div class="pagination-btns" id="pagination-btns"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Chi tiết đặt lịch</div>
+      <button class="modal-close" onclick="closeDetail()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-grid" id="detail-content">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="status-update-row">
+        <label for="status-select">Cập nhật trạng thái:</label>
+        <select class="filter-select" id="status-select">
+          <option value="Chờ xử lý">Chờ xử lý</option>
+          <option value="Đã xác nhận">Đã xác nhận</option>
+          <option value="Hoàn thành">Hoàn thành</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+        <button class="btn btn-primary btn-sm" id="update-status-btn" onclick="updateStatus()">Cập nhật</button>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDetail()">Đóng</button>
+      <button class="btn btn-danger" id="delete-detail-btn" onclick="deleteFromDetail()">Xóa lịch hẹn</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('dat-lich');
+
+  var allDatLich      = [];
+  var filteredDatLich = [];
+  var currentPage     = 1;
+  var PAGE_SIZE       = 12;
+  var viewingId       = null;
+
+  async function loadDatLich() {
+    document.getElementById('table-container').innerHTML =
+      '<div class="loading"><div class="spinner"></div> Đang tải...</div>';
+
+    var res = await API.getDatLich();
+    if (!res || !res.ok) {
+      document.getElementById('table-container').innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Không thể tải dữ liệu. Vui lòng thử lại.</div></div>';
+      return;
+    }
+
+    allDatLich = Array.isArray(res.data.data) ? res.data.data : [];
+    applyFilter();
+  }
+
+  function applyFilter() {
+    var q  = document.getElementById('search-input').value.toLowerCase();
+    var st = document.getElementById('filter-status').value;
+
+    filteredDatLich = allDatLich.filter(function(d) {
+      var matchQ = !q ||
+        (d.ho_ten || '').toLowerCase().indexOf(q) !== -1 ||
+        (d.so_dien_thoai || '').toLowerCase().indexOf(q) !== -1;
+      var matchSt = !st || d.trang_thai === st;
+      return matchQ && matchSt;
+    });
+
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  function renderTable() {
+    var start   = (currentPage - 1) * PAGE_SIZE;
+    var items   = filteredDatLich.slice(start, start + PAGE_SIZE);
+    var container = document.getElementById('table-container');
+
+    if (filteredDatLich.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Không tìm thấy đặt lịch nào</div></div>';
+      return;
+    }
+
+    var rows = items.map(function(d, idx) {
+      var num = (currentPage - 1) * PAGE_SIZE + idx + 1;
+      return '<tr>' +
+        '<td style="color:var(--muted);font-size:12px">' + num + '</td>' +
+        '<td>' + (d.ho_ten || '—') + '</td>' +
+        '<td>' + (d.so_dien_thoai || '—') + '</td>' +
+        '<td>' + (d.xe_quan_tam || '—') + '</td>' +
+        '<td>' + formatDate(d.ngay_hen) + '</td>' +
+        '<td>' + trangThaiBadge(d.trang_thai) + '</td>' +
+        '<td>' +
+          '<button class="btn btn-secondary btn-icon btn-sm" onclick="openDetail(' + d.id + ')" title="Xem chi tiết">👁</button> ' +
+          '<button class="btn btn-danger btn-icon btn-sm" onclick="handleDelete(' + d.id + ')" title="Xóa">🗑️</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    container.innerHTML =
+      '<table>' +
+        '<thead><tr>' +
+          '<th>#</th>' +
+          '<th>Họ tên</th>' +
+          '<th>Số điện thoại</th>' +
+          '<th>Xe quan tâm</th>' +
+          '<th>Ngày hẹn</th>' +
+          '<th>Trạng thái</th>' +
+          '<th style="width:100px">Thao tác</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+  }
+
+  function renderPagination() {
+    var total      = filteredDatLich.length;
+    var totalPages = Math.ceil(total / PAGE_SIZE);
+    var start      = total > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0;
+    var end        = Math.min(currentPage * PAGE_SIZE, total);
+
+    document.getElementById('pagination-info').textContent =
+      total > 0 ? 'Hiển thị ' + start + '–' + end + ' / ' + total + ' lịch hẹn' : 'Không có kết quả';
+
+    renderPaginationBtns('pagination-btns', currentPage, totalPages, 'changePage');
+  }
+
+  function changePage(page) {
+    var totalPages = Math.ceil(filteredDatLich.length / PAGE_SIZE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTable();
+    renderPagination();
+  }
+
+  async function openDetail(id) {
+    viewingId = id;
+
+    var res = await API.getDatLichById(id);
+    if (!res || !res.ok) {
+      showToast('Không thể tải chi tiết đặt lịch', 'error');
+      return;
+    }
+
+    var d = res.data.data;
+
+    document.getElementById('detail-content').innerHTML =
+      '<div class="detail-item">' +
+        '<label>Họ tên</label>' +
+        '<p>' + (d.ho_ten || '—') + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Số điện thoại</label>' +
+        '<p>' + (d.so_dien_thoai || '—') + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Email</label>' +
+        '<p>' + (d.email || '—') + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Xe quan tâm</label>' +
+        '<p>' + (d.xe_quan_tam || '—') + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Ngày hẹn</label>' +
+        '<p>' + formatDate(d.ngay_hen) + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Trạng thái hiện tại</label>' +
+        '<p>' + trangThaiBadge(d.trang_thai) + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Ngày tạo</label>' +
+        '<p>' + formatDateTime(d.created_at) + '</p>' +
+      '</div>' +
+      '<div class="detail-item">' +
+        '<label>Cập nhật lần cuối</label>' +
+        '<p>—</p>' +
+      '</div>' +
+      '<div class="detail-item full">' +
+        '<label>Ghi chú</label>' +
+        '<p>' + (d.ghi_chu || '—') + '</p>' +
+      '</div>';
+
+    document.getElementById('status-select').value = d.trang_thai || 'Chờ xử lý';
+    document.getElementById('update-status-btn').disabled    = false;
+    document.getElementById('update-status-btn').textContent = 'Cập nhật';
+
+    document.getElementById('detail-modal').classList.add('open');
+  }
+
+  function closeDetail() {
+    document.getElementById('detail-modal').classList.remove('open');
+    viewingId = null;
+  }
+
+  async function updateStatus() {
+    if (!viewingId) return;
+    var newStatus = document.getElementById('status-select').value;
+    var btn = document.getElementById('update-status-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Đang cập nhật...';
+
+    var res = await API.updateTrangThai(viewingId, newStatus);
+    if (res && res.ok) {
+      showToast('Cập nhật trạng thái thành công');
+      // Update local data
+      var item = allDatLich.filter(function(d) { return d.id === viewingId; })[0];
+      if (item) item.trang_thai = newStatus;
+      renderTable();
+      closeDetail();
+    } else {
+      showToast('Không thể cập nhật trạng thái', 'error');
+    }
+
+    btn.disabled    = false;
+    btn.textContent = 'Cập nhật';
+  }
+
+  function deleteFromDetail() {
+    if (!viewingId) return;
+    var id   = viewingId;
+    var item = allDatLich.filter(function(d) { return d.id === id; })[0];
+    var name = item ? item.ho_ten : '';
+    showConfirm('Bạn có chắc muốn xóa lịch hẹn của "' + name + '"?', async function() {
+      var res = await API.deleteDatLich(id);
+      if (res && res.ok) {
+        showToast('Đã xóa lịch hẹn thành công');
+        closeDetail();
+        loadDatLich();
+      } else {
+        showToast('Không thể xóa lịch hẹn này', 'error');
+      }
+    });
+  }
+
+  function handleDelete(id) {
+    var item = allDatLich.filter(function(d) { return d.id === id; })[0];
+    var name = item ? item.ho_ten : '';
+    showConfirm('Bạn có chắc muốn xóa lịch hẹn của "' + name + '"?', async function() {
+      var res = await API.deleteDatLich(id);
+      if (res && res.ok) {
+        showToast('Đã xóa lịch hẹn thành công');
+        loadDatLich();
+      } else {
+        showToast('Không thể xóa lịch hẹn này', 'error');
+      }
+    });
+  }
+
+  document.getElementById('search-input').addEventListener('input', applyFilter);
+  document.getElementById('filter-status').addEventListener('change', applyFilter);
+
+  document.getElementById('detail-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDetail();
+  });
+
+  loadDatLich();
+</script>
+
+</body>
+</html>

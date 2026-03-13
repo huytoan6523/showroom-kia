@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin tức — Showroom KIA</title>
+  <meta name="description" content="Tin tức mới nhất về xe KIA, sự kiện và ưu đãi từ showroom.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-top">
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html"    class="nav-link">Trang chủ</a>
+          <a href="xe.html"       class="nav-link">Dòng xe</a>
+          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
+          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Trang chủ</a>
+        <span>/</span>
+        <span>Tin tức</span>
+      </div>
+      <h1>Tin tức &amp; Sự kiện</h1>
+      <p>Cập nhật thông tin mới nhất từ KIA và showroom của chúng tôi.</p>
+    </div>
+  </div>
+
+  <!-- ═══ NEWS LISTING ═══ -->
+  <section class="section">
+    <div class="container">
+      <div class="card-grid" id="news-grid"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+
+    (async function init() {
+      const grid = document.getElementById('news-grid');
+      grid.innerHTML = spinnerHTML();
+
+      const news = await apiFetch('/tin-tuc');
+      if (!news || !news.length) {
+        grid.innerHTML = emptyHTML('Chưa có tin tức nào.');
+        return;
+      }
+
+      const sorted = [...news].sort((a, b) => (b.noi_bat ? 1 : 0) - (a.noi_bat ? 1 : 0));
+      grid.innerHTML = sorted.map((t, i) => `
+        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='tin-chi-tiet.html?id=${t.id}'">
+          <div class="card-img-wrap">
+            ${imgTag(t.anh_dai_dien, t.tieu_de, '')}
+          </div>
+          <div class="card-body">
+            ${t.danh_muc ? `<span class="card-badge">${t.danh_muc}</span>` : ''}
+            <div class="card-meta">${formatDate(t.created_at)}</div>
+            <div class="card-title">${t.tieu_de}</div>
+            <div class="card-desc">${t.tom_tat || ''}</div>
+            <span class="card-link">Đọc thêm <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>`).join('');
+
+      initScrollReveal();
+    })();
+  </script>
+</body>
+</html>

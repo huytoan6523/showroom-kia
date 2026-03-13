@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dòng xe KIA — Showroom KIA</title>
+  <meta name="description" content="Khám phá toàn bộ dòng xe KIA tại showroom chính hãng. SUV, Sedan, MPV và nhiều hơn nữa.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-top">
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html"    class="nav-link">Trang chủ</a>
+          <a href="xe.html"       class="nav-link">Dòng xe</a>
+          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
+          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Trang chủ</a>
+        <span>/</span>
+        <span>Dòng xe</span>
+      </div>
+      <h1>Dòng xe KIA</h1>
+      <p>Khám phá toàn bộ danh mục xe KIA tại showroom của chúng tôi.</p>
+    </div>
+  </div>
+
+  <!-- ═══ CAR LISTING ═══ -->
+  <section class="section">
+    <div class="container">
+      <div class="filter-bar" id="filter-bar"></div>
+      <div class="card-grid" id="car-grid"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+
+    let allCars = [];
+
+    function renderCars(list) {
+      const grid = document.getElementById('car-grid');
+      if (!list || !list.length) {
+        grid.innerHTML = emptyHTML('Không có xe trong danh mục này.');
+        return;
+      }
+      grid.innerHTML = list.map((xe, i) => {
+        const priceText = formatPriceRange(xe.PhienBans);
+        return `
+          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='xe-chi-tiet.html?id=${xe.id}'">
+            <div class="card-img-wrap">
+              ${imgTag(xe.anh_dai_dien, xe.ten_xe, '')}
+            </div>
+            <div class="card-body">
+              ${xe.loai_xe ? `<span class="card-badge">${xe.loai_xe}</span>` : ''}
+              <div class="card-title">${xe.ten_xe}</div>
+              <div class="card-price">${priceText}</div>
+              <span class="card-link">Xem chi tiết <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </div>`;
+      }).join('');
+      initScrollReveal();
+    }
+
+    function buildFilters(cars) {
+      const bar = document.getElementById('filter-bar');
+      const categories = [...new Set(cars.map(c => c.loai_xe).filter(Boolean))];
+      if (!categories.length) return;
+
+      const buttons = [{ label: 'Tất cả', value: '' }, ...categories.map(c => ({ label: c, value: c }))];
+      bar.innerHTML = buttons.map(b =>
+        `<button class="filter-btn${b.value === '' ? ' active' : ''}" data-value="${b.value}">${b.label}</button>`
+      ).join('');
+
+      bar.addEventListener('click', e => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        bar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const val = btn.dataset.value;
+        renderCars(val ? allCars.filter(c => c.loai_xe === val) : allCars);
+      });
+    }
+
+    (async function init() {
+      const grid = document.getElementById('car-grid');
+      grid.innerHTML = spinnerHTML();
+
+      const cars = await apiFetch('/xe');
+      if (!cars || !cars.length) {
+        grid.innerHTML = emptyHTML('Không có dữ liệu xe.');
+        return;
+      }
+      allCars = cars;
+      buildFilters(cars);
+      renderCars(cars);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ảnh Slide — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    /* ── Upload area ── */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--surface);
+      margin-bottom: 24px;
+    }
+    .upload-area:hover,
+    .upload-area.drag-over {
+      border-color: var(--primary);
+      background: rgba(187,22,43,0.04);
+    }
+    .upload-area .upload-icon { font-size: 40px; margin-bottom: 12px; }
+    .upload-area p { color: var(--muted); font-size: 14px; margin: 4px 0; text-transform: none; }
+    .upload-area strong { color: var(--text); font-size: 15px; text-transform: none; }
+    #file-input { display: none; }
+
+    /* ── Preview grid ── */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .preview-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+    .preview-item img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .preview-item .remove-preview {
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,0.6); color: white;
+      border: none; border-radius: 50%;
+      width: 22px; height: 22px; font-size: 12px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Slide grid ── */
+    .slide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .slide-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .slide-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-2px); }
+    .slide-card img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+    }
+    .slide-card-info {
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .slide-card-order { font-size: 12px; color: var(--muted); }
+    .slide-card-order strong { color: var(--text); }
+    .slide-del-btn {
+      background: rgba(220,38,38,0.1); color: #dc2626;
+      border: none; border-radius: 6px;
+      padding: 5px 10px; font-size: 12px; cursor: pointer;
+      font-family: inherit; transition: background 0.2s; text-transform: none;
+    }
+    .slide-del-btn:hover { background: rgba(220,38,38,0.2); }
+
+    /* ── Upload actions ── */
+    .upload-actions {
+      display: flex; gap: 12px; align-items: center;
+    }
+    .empty-slides {
+      grid-column: 1/-1; text-align: center;
+      padding: 48px; color: var(--muted); font-size: 15px;
+    }
+    .empty-slides .empty-icon { font-size: 40px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Ảnh Slide Khách Hàng</div>
+      <div class="page-subtitle">Quản lý ảnh hiển thị trên trang chủ</div>
+    </div>
+  </div>
+
+  <!-- Upload section -->
+  <div class="card" style="margin-bottom: 28px;">
+    <div class="card-header">
+      <div class="card-title">Tải ảnh lên</div>
+    </div>
+
+    <div style="padding: 24px;">
+      <!-- Drop zone -->
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+        <div class="upload-icon">🖼️</div>
+        <strong>Kéo thả ảnh vào đây hoặc nhấn để chọn</strong>
+        <p>Chấp nhận: JPG, PNG, WebP · Tối đa 5MB/ảnh · Có thể chọn nhiều ảnh</p>
+      </div>
+      <input type="file" id="file-input" multiple accept="image/jpeg,image/png,image/webp">
+
+      <!-- Preview -->
+      <div class="preview-grid" id="preview-grid"></div>
+
+      <!-- Actions -->
+      <div class="upload-actions" id="upload-actions" style="display:none;">
+        <button class="btn btn-primary" id="btn-upload" onclick="doUpload()">
+          ⬆️ Tải lên
+        </button>
+        <button class="btn btn-secondary" onclick="clearPreviews()">Hủy</button>
+        <span id="upload-count" style="color:var(--muted);font-size:13px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide grid -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Danh sách ảnh slide</div>
+      <span id="slide-count" style="color:var(--muted);font-size:13px;"></span>
+    </div>
+    <div style="padding: 24px;">
+      <div class="slide-grid" id="slide-grid">
+        <div class="loading" style="grid-column:1/-1;padding:40px 0;text-align:center;">
+          <div class="spinner"></div>&nbsp;Đang tải...
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('anh-slide');
+
+  let selectedFiles = [];
+
+  // ── Load slides ──────────────────────────────────────────────
+  async function loadSlides() {
+    const res = await API.getAnhSlide();
+    const grid = document.getElementById('slide-grid');
+    const countEl = document.getElementById('slide-count');
+
+    if (!res || !res.ok) {
+      grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">⚠️</div><p>Lỗi tải dữ liệu</p></div>`;
+      return;
+    }
+
+    const slides = res.data.data || res.data || [];
+    countEl.textContent = `${slides.length} ảnh`;
+
+    if (slides.length === 0) {
+      grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">🖼️</div><p>Chưa có ảnh nào. Hãy tải ảnh lên!</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = slides.map(s => `
+      <div class="slide-card" id="slide-${s.id}">
+        <img src="${imgSrc(s.url_anh)}" alt="Slide ${s.id}"
+          onerror="this.src='https://via.placeholder.com/200x150?text=Lỗi+ảnh'">
+        <div class="slide-card-info">
+          <span class="slide-card-order">Thứ tự: <strong>${s.thu_tu}</strong></span>
+          <button class="slide-del-btn" onclick="deleteSlide(${s.id})">🗑️ Xóa</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Delete slide ─────────────────────────────────────────────
+  async function deleteSlide(id) {
+    showConfirm('Bạn có chắc muốn xóa ảnh này không?', async () => {
+      const res = await API.deleteAnhSlide(id);
+      if (res && res.ok) {
+        showToast('Đã xóa ảnh thành công');
+        document.getElementById('slide-' + id)?.remove();
+        // Update count
+        const grid = document.getElementById('slide-grid');
+        const remaining = grid.querySelectorAll('.slide-card').length;
+        document.getElementById('slide-count').textContent = `${remaining} ảnh`;
+        if (remaining === 0) {
+          grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">🖼️</div><p>Chưa có ảnh nào. Hãy tải ảnh lên!</p></div>`;
+        }
+      } else {
+        showToast('Xóa ảnh thất bại', 'error');
+      }
+    });
+  }
+
+  // ── File selection ────────────────────────────────────────────
+  document.getElementById('file-input').addEventListener('change', function () {
+    handleFiles(Array.from(this.files));
+    this.value = ''; // reset so same file can be selected again
+  });
+
+  // Drag & drop
+  const uploadArea = document.getElementById('upload-area');
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+  });
+
+  function handleFiles(files) {
+    const MAX = 5 * 1024 * 1024;
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    files.forEach(f => {
+      if (!allowed.includes(f.type)) { showToast(`${f.name}: Định dạng không hỗ trợ`, 'warning'); return; }
+      if (f.size > MAX) { showToast(`${f.name}: Ảnh quá lớn (max 5MB)`, 'warning'); return; }
+      selectedFiles.push(f);
+    });
+    renderPreviews();
+  }
+
+  function renderPreviews() {
+    const grid = document.getElementById('preview-grid');
+    const actions = document.getElementById('upload-actions');
+    const countEl = document.getElementById('upload-count');
+
+    if (selectedFiles.length === 0) {
+      grid.innerHTML = '';
+      actions.style.display = 'none';
+      return;
+    }
+
+    actions.style.display = 'flex';
+    countEl.textContent = `${selectedFiles.length} ảnh được chọn`;
+    grid.innerHTML = selectedFiles.map((f, idx) => {
+      const url = URL.createObjectURL(f);
+      return `
+        <div class="preview-item" id="prev-${idx}">
+          <img src="${url}" alt="${f.name}">
+          <button class="remove-preview" onclick="removePreview(${idx})">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  function removePreview(idx) {
+    selectedFiles.splice(idx, 1);
+    renderPreviews();
+  }
+
+  function clearPreviews() {
+    selectedFiles = [];
+    renderPreviews();
+  }
+
+  // ── Upload ─────────────────────────────────────────────────────
+  async function doUpload() {
+    if (selectedFiles.length === 0) return;
+    const btn = document.getElementById('btn-upload');
+    btn.textContent = '⏳ Đang tải...';
+    btn.disabled = true;
+
+    const fd = new FormData();
+    selectedFiles.forEach(f => fd.append('images', f));
+
+    const res = await API.uploadAnhSlide(fd);
+    btn.textContent = '⬆️ Tải lên';
+    btn.disabled = false;
+
+    if (res && res.ok) {
+      showToast(`Tải lên thành công ${selectedFiles.length} ảnh`);
+      clearPreviews();
+      loadSlides();
+    } else {
+      showToast('Tải lên thất bại, vui lòng thử lại', 'error');
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  loadSlides();
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      align-items: start;
+    }
+    .settings-col { display: flex; flex-direction: column; gap: 24px; }
+    @media (max-width: 900px) {
+      .settings-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Cài đặt hệ thống</div>
+      <div class="page-subtitle">Quản lý thông tin showroom và tài khoản</div>
+    </div>
+  </div>
+
+  <div class="settings-layout">
+    <!-- Left column -->
+    <div class="settings-col">
+
+      <!-- Showroom info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Thông tin showroom</div>
+        </div>
+        <div class="card-body" id="settings-form-wrap">
+          <div class="loading"><div class="spinner"></div> Đang tải...</div>
+        </div>
+      </div>
+
+      <!-- Change password -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Đổi mật khẩu</div>
+        </div>
+        <div class="card-body">
+          <div class="settings-section">
+            <div class="form-grid" style="grid-template-columns:1fr">
+              <div class="form-group">
+                <label class="form-label" for="pw-cu">Mật khẩu hiện tại <span class="req">*</span></label>
+                <input type="password" class="form-control" id="pw-cu" placeholder="Nhập mật khẩu hiện tại" autocomplete="current-password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pw-moi">Mật khẩu mới <span class="req">*</span></label>
+                <input type="password" class="form-control" id="pw-moi" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pw-xac-nhan">Xác nhận mật khẩu mới <span class="req">*</span></label>
+                <input type="password" class="form-control" id="pw-xac-nhan" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:4px">
+            <button class="btn btn-primary" id="pw-btn" onclick="savePassword()">Đổi mật khẩu</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="settings-col">
+
+      <!-- System info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Thông tin hệ thống</div>
+        </div>
+        <div class="card-body">
+          <ul class="info-list">
+            <li>
+              <span>Phiên bản</span>
+              <span>v1.0.0</span>
+            </li>
+            <li>
+              <span>Backend</span>
+              <span>Node.js + Express</span>
+            </li>
+            <li>
+              <span>Cơ sở dữ liệu</span>
+              <span>MySQL (Sequelize)</span>
+            </li>
+            <li>
+              <span>API Base</span>
+              <span>http://localhost:3000/api</span>
+            </li>
+            <li>
+              <span>Tài liệu API</span>
+              <span><a href="http://localhost:3000/api-docs" target="_blank">Swagger UI →</a></span>
+            </li>
+            <li>
+              <span>Môi trường</span>
+              <span>Development</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Quick links -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Truy cập nhanh</div>
+        </div>
+        <div class="card-body">
+          <ul class="info-list">
+            <li>
+              <span>Quản lý xe</span>
+              <span><a href="xe.html" class="link">Xe →</a></span>
+            </li>
+            <li>
+              <span>Quản lý tin tức</span>
+              <span><a href="tin-tuc.html" class="link">Tin tức →</a></span>
+            </li>
+            <li>
+              <span>Đặt lịch</span>
+              <span><a href="dat-lich.html" class="link">Lịch hẹn →</a></span>
+            </li>
+            <li>
+              <span>Tổng quan</span>
+              <span><a href="dashboard.html" class="link">Dashboard →</a></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('cai-dat');
+
+  async function loadSettings() {
+    var res = await API.getCaiDat();
+    var s = (res && res.ok && res.data && res.data.data) ? res.data.data : {};
+
+    document.getElementById('settings-form-wrap').innerHTML = `
+      <div class="settings-section">
+        <div class="settings-section-title">Thông tin cơ bản</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label" for="s-ten-showroom">Tên showroom</label>
+            <input type="text" class="form-control" id="s-ten-showroom" value="${escVal(s.ten_cong_ty)}" placeholder="Nhập tên showroom">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-sdt">Số điện thoại</label>
+            <input type="text" class="form-control" id="s-sdt" value="${escVal(s.so_dien_thoai)}" placeholder="VD: 0909 000 000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-email">Email</label>
+            <input type="email" class="form-control" id="s-email" value="${escVal(s.email)}" placeholder="VD: info@kia.vn">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-website">Facebook</label>
+            <input type="text" class="form-control" id="s-website" value="${escVal(s.facebook)}" placeholder="VD: https://facebook.com/kia">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-gio-lam-viec">Giờ làm việc</label>
+            <input type="text" class="form-control" id="s-gio-lam-viec" value="${escVal(s.gio_lam_viec)}" placeholder="VD: 8:00 – 18:00, T2–CN">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Địa chỉ & Mô tả</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <label class="form-label" for="s-dia-chi">Địa chỉ</label>
+            <input type="text" class="form-control" id="s-dia-chi" value="${escVal(s.dia_chi)}" placeholder="Nhập địa chỉ showroom">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-mo-ta">Giới thiệu</label>
+            <textarea class="form-control" id="s-mo-ta" placeholder="Giới thiệu về showroom...">${escVal(s.gioi_thieu)}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="settings-btn" onclick="saveSettings()">Lưu thay đổi</button>
+    `;
+  }
+
+  function escVal(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function saveSettings() {
+    var btn = document.getElementById('settings-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Đang lưu...';
+
+    var body = {
+      ten_cong_ty:   document.getElementById('s-ten-showroom').value.trim()  || null,
+      so_dien_thoai: document.getElementById('s-sdt').value.trim()           || null,
+      email:         document.getElementById('s-email').value.trim()         || null,
+      facebook:      document.getElementById('s-website').value.trim()       || null,
+      dia_chi:       document.getElementById('s-dia-chi').value.trim()       || null,
+      gio_lam_viec:  document.getElementById('s-gio-lam-viec').value.trim()  || null,
+      gioi_thieu:    document.getElementById('s-mo-ta').value.trim()         || null,
+    };
+
+    var res = await API.updateCaiDat(body);
+
+    if (res && res.ok) {
+      showToast('Lưu cài đặt thành công');
+    } else {
+      showToast((res && res.data && res.data.message) || 'Lỗi khi lưu cài đặt', 'error');
+    }
+
+    btn.disabled    = false;
+    btn.textContent = 'Lưu thay đổi';
+  }
+
+  async function savePassword() {
+    var matKhauCu     = document.getElementById('pw-cu').value;
+    var matKhauMoi    = document.getElementById('pw-moi').value;
+    var xacNhan       = document.getElementById('pw-xac-nhan').value;
+    var btn           = document.getElementById('pw-btn');
+
+    if (!matKhauCu || !matKhauMoi || !xacNhan) {
+      showToast('Vui lòng điền đầy đủ thông tin', 'warning');
+      return;
+    }
+
+    if (matKhauMoi.length < 6) {
+      showToast('Mật khẩu mới phải có ít nhất 6 ký tự', 'warning');
+      return;
+    }
+
+    if (matKhauMoi !== xacNhan) {
+      showToast('Xác nhận mật khẩu không khớp', 'warning');
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Đang xử lý...';
+
+    var res = await API.doiMatKhau({
+      mat_khau_cu:  matKhauCu,
+      mat_khau_moi: matKhauMoi,
+      xac_nhan:     xacNhan,
+    });
+
+    if (res && res.ok) {
+      showToast('Đổi mật khẩu thành công');
+      document.getElementById('pw-cu').value      = '';
+      document.getElementById('pw-moi').value     = '';
+      document.getElementById('pw-xac-nhan').value = '';
+    } else {
+      var msg = (res && res.data && res.data.message) || 'Mật khẩu hiện tại không đúng';
+      showToast(msg, 'error');
+    }
+
+    btn.disabled    = false;
+    btn.textContent = 'Đổi mật khẩu';
+  }
+
+  loadSettings();
+</script>
+
+</body>
+</html>

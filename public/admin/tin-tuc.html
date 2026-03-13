@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin tức — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Tin tức</div>
+      <div class="page-subtitle">Quản lý bài viết và tin tức showroom</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAdd()">+ Thêm bài viết</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Danh sách bài viết</div>
+      <div class="toolbar" style="margin-bottom:0">
+        <input type="text" class="search-input" id="search-input" placeholder="Tìm theo tiêu đề, danh mục...">
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="table-container">
+        <div class="loading"><div class="spinner"></div> Đang tải...</div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info" id="pagination-info"></div>
+      <div class="pagination-btns" id="pagination-btns"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" id="tt-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Thêm bài viết</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label" for="f-tieu-de">Tiêu đề <span class="req">*</span></label>
+          <input type="text" class="form-control" id="f-tieu-de" placeholder="Nhập tiêu đề bài viết">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-danh_muc">Danh mục</label>
+          <select class="form-control" id="f-danh_muc">
+            <option value="">-- Chọn danh mục --</option>
+            <option value="Tin tức">Tin tức</option>
+            <option value="Khuyến mãi">Khuyến mãi</option>
+            <option value="Sự kiện">Sự kiện</option>
+            <option value="Sản phẩm">Sản phẩm</option>
+            <option value="Công nghệ">Công nghệ</option>
+            <option value="Hướng dẫn">Hướng dẫn</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-noi_bat">Nổi bật</label>
+          <select class="form-control" id="f-noi_bat">
+            <option value="0">Không</option>
+            <option value="1">Có</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label" for="f-tom-tat">Tóm tắt</label>
+          <textarea class="form-control" id="f-tom-tat" placeholder="Mô tả ngắn về bài viết..." style="min-height:70px"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label" for="f-noi-dung">Nội dung</label>
+          <textarea class="form-control" id="f-noi-dung" placeholder="Nội dung chi tiết bài viết..." style="min-height:140px"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Ảnh bài viết</label>
+          <div class="upload-area" id="upload-area" onclick="document.getElementById('f-anh').click()">
+            <input type="file" id="f-anh" accept="image/*" style="display:none">
+            <span class="upload-label" id="upload-label">📷 Nhấn để chọn ảnh (JPG, PNG, WEBP)</span>
+            <img id="current-img" class="upload-preview" alt="">
+            <img id="img-preview" class="upload-preview" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveTinTuc()">Lưu bài viết</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('tin-tuc');
+
+  var allTinTuc      = [];
+  var filteredTinTuc = [];
+  var currentPage    = 1;
+  var PAGE_SIZE      = 10;
+  var editingId      = null;
+
+  async function loadTinTuc() {
+    document.getElementById('table-container').innerHTML =
+      '<div class="loading"><div class="spinner"></div> Đang tải...</div>';
+
+    var res = await API.getTinTuc();
+    if (!res || !res.ok) {
+      document.getElementById('table-container').innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Không thể tải dữ liệu. Vui lòng thử lại.</div></div>';
+      return;
+    }
+
+    allTinTuc = Array.isArray(res.data.data) ? res.data.data : [];
+    applyFilter();
+  }
+
+  function applyFilter() {
+    var q = document.getElementById('search-input').value.toLowerCase();
+    filteredTinTuc = allTinTuc.filter(function(t) {
+      return (t.tieu_de  || '').toLowerCase().indexOf(q) !== -1 ||
+             (t.danh_muc || '').toLowerCase().indexOf(q) !== -1;
+    });
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  function danhMucBadge(dm) {
+    if (!dm) return '—';
+    var colors = {
+      'Tin tức':    'badge-blue',
+      'Khuyến mãi': 'badge-accent',
+      'Sự kiện':    'badge-purple',
+      'Sản phẩm':   'badge-teal',
+      'Công nghệ':  'badge-yellow',
+      'Hướng dẫn':  'badge-green',
+    };
+    var cls = colors[dm] || 'badge-gray';
+    return '<span class="badge ' + cls + '">' + dm + '</span>';
+  }
+
+  function renderTable() {
+    var start   = (currentPage - 1) * PAGE_SIZE;
+    var items   = filteredTinTuc.slice(start, start + PAGE_SIZE);
+    var container = document.getElementById('table-container');
+
+    if (filteredTinTuc.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Không tìm thấy bài viết nào</div></div>';
+      return;
+    }
+
+    var rows = items.map(function(t) {
+      var imgCell = t.anh_dai_dien
+        ? '<img class="table-img" src="' + imgSrc(t.anh_dai_dien) + '" alt="" onerror="this.style.display=\'none\'">'
+        : '<div class="no-image">No img</div>';
+
+      var noiBatCell = t.noi_bat
+        ? '<span class="badge badge-accent">Nổi bật</span>'
+        : '<span class="badge badge-gray">Không</span>';
+
+      return '<tr>' +
+        '<td>' + imgCell + '</td>' +
+        '<td style="max-width:280px">' + (t.tieu_de || '—') + '</td>' +
+        '<td>' + danhMucBadge(t.danh_muc) + '</td>' +
+        '<td>' + formatDate(t.created_at) + '</td>' +
+        '<td>' + noiBatCell + '</td>' +
+        '<td>' +
+          '<button class="btn btn-secondary btn-icon btn-sm" onclick="openEdit(' + t.id + ')" title="Chỉnh sửa">✏️</button> ' +
+          '<button class="btn btn-danger btn-icon btn-sm" onclick="handleDelete(' + t.id + ')" title="Xóa">🗑️</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    container.innerHTML =
+      '<table>' +
+        '<thead><tr>' +
+          '<th>Ảnh</th>' +
+          '<th>Tiêu đề</th>' +
+          '<th>Danh mục</th>' +
+          '<th>Ngày đăng</th>' +
+          '<th>Nổi bật</th>' +
+          '<th style="width:110px">Thao tác</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+  }
+
+  function renderPagination() {
+    var total      = filteredTinTuc.length;
+    var totalPages = Math.ceil(total / PAGE_SIZE);
+    var start      = total > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0;
+    var end        = Math.min(currentPage * PAGE_SIZE, total);
+
+    document.getElementById('pagination-info').textContent =
+      total > 0 ? 'Hiển thị ' + start + '–' + end + ' / ' + total + ' bài viết' : 'Không có kết quả';
+
+    renderPaginationBtns('pagination-btns', currentPage, totalPages, 'changePage');
+  }
+
+  function changePage(page) {
+    var totalPages = Math.ceil(filteredTinTuc.length / PAGE_SIZE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTable();
+    renderPagination();
+  }
+
+  function resetForm() {
+    document.getElementById('f-tieu-de').value  = '';
+    document.getElementById('f-danh_muc').value = '';
+    document.getElementById('f-noi_bat').value  = '0';
+    document.getElementById('f-tom-tat').value  = '';
+    document.getElementById('f-noi-dung').value = '';
+    document.getElementById('f-anh').value      = '';
+    document.getElementById('img-preview').style.display  = 'none';
+    document.getElementById('current-img').style.display  = 'none';
+    document.getElementById('upload-label').style.display = 'block';
+    document.getElementById('save-btn').disabled    = false;
+    document.getElementById('save-btn').textContent = 'Lưu bài viết';
+  }
+
+  function openAdd() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Thêm bài viết mới';
+    resetForm();
+    document.getElementById('tt-modal').classList.add('open');
+  }
+
+  async function openEdit(id) {
+    editingId = id;
+    document.getElementById('modal-title').textContent = 'Chỉnh sửa bài viết';
+    document.getElementById('save-btn').disabled    = false;
+    document.getElementById('save-btn').textContent = 'Lưu bài viết';
+
+    var res = await API.getTinTucById(id);
+    if (!res || !res.ok) {
+      showToast('Không thể tải thông tin bài viết', 'error');
+      return;
+    }
+
+    var t = res.data.data;
+    document.getElementById('f-tieu-de').value  = t.tieu_de  || '';
+    document.getElementById('f-danh_muc').value = t.danh_muc || '';
+    document.getElementById('f-noi_bat').value  = t.noi_bat  ? '1' : '0';
+    document.getElementById('f-tom-tat').value  = t.tom_tat  || '';
+    document.getElementById('f-noi-dung').value = t.noi_dung || '';
+    document.getElementById('f-anh').value      = '';
+    document.getElementById('img-preview').style.display = 'none';
+
+    var currentImg = document.getElementById('current-img');
+    if (t.anh_dai_dien) {
+      currentImg.src = imgSrc(t.anh_dai_dien);
+      currentImg.style.display = 'block';
+      document.getElementById('upload-label').style.display = 'none';
+    } else {
+      currentImg.style.display = 'none';
+      document.getElementById('upload-label').style.display = 'block';
+    }
+
+    document.getElementById('tt-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('tt-modal').classList.remove('open');
+  }
+
+  document.getElementById('f-anh').addEventListener('change', function() {
+    var file = this.files[0];
+    if (file) {
+      var preview = document.getElementById('img-preview');
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+      document.getElementById('current-img').style.display  = 'none';
+      document.getElementById('upload-label').style.display = 'none';
+    }
+  });
+
+  async function saveTinTuc() {
+    var tieuDe = document.getElementById('f-tieu-de').value.trim();
+    if (!tieuDe) {
+      showToast('Vui lòng nhập tiêu đề bài viết', 'warning');
+      return;
+    }
+
+    var body = {
+      tieu_de:  tieuDe,
+      tom_tat:  document.getElementById('f-tom-tat').value   || null,
+      noi_dung: document.getElementById('f-noi-dung').value  || null,
+      danh_muc: document.getElementById('f-danh_muc').value  || null,
+      noi_bat:  document.getElementById('f-noi_bat').value   === '1',
+    };
+
+    var saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled    = true;
+    saveBtn.textContent = 'Đang lưu...';
+
+    var res = editingId ? await API.updateTinTuc(editingId, body) : await API.createTinTuc(body);
+
+    if (!res || !res.ok) {
+      showToast((res && res.data && res.data.message) || 'Lỗi khi lưu dữ liệu', 'error');
+      saveBtn.disabled    = false;
+      saveBtn.textContent = 'Lưu bài viết';
+      return;
+    }
+
+    var savedId = editingId ||
+      (res.data && res.data.data && res.data.data.id);
+
+    var fileInput = document.getElementById('f-anh');
+    if (fileInput.files.length > 0 && savedId) {
+      var fd = new FormData();
+      fd.append('image', fileInput.files[0]);
+      var uploadRes = await API.uploadAnhTinTuc(savedId, fd);
+      if (!uploadRes || !uploadRes.ok) {
+        showToast('Lưu thành công nhưng upload ảnh thất bại', 'warning');
+      }
+    }
+
+    showToast(editingId ? 'Cập nhật bài viết thành công' : 'Thêm bài viết thành công');
+    closeModal();
+    loadTinTuc();
+  }
+
+  function handleDelete(id) {
+    var item = allTinTuc.filter(function(t) { return t.id === id; })[0];
+    var title = item ? item.tieu_de : '';
+    showConfirm('Bạn có chắc muốn xóa bài viết "' + title + '"?', async function() {
+      var res = await API.deleteTinTuc(id);
+      if (res && res.ok) {
+        showToast('Đã xóa bài viết thành công');
+        loadTinTuc();
+      } else {
+        showToast('Không thể xóa bài viết này', 'error');
+      }
+    });
+  }
+
+  document.getElementById('search-input').addEventListener('input', applyFilter);
+
+  document.getElementById('tt-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadTinTuc();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng quan — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Tổng quan</div>
+      <div class="page-subtitle">Chào mừng trở lại, Administrator</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="loading" style="padding:20px 0"><div class="spinner"></div></div></div>
+    <div class="stat-card"><div class="loading" style="padding:20px 0"><div class="spinner"></div></div></div>
+    <div class="stat-card"><div class="loading" style="padding:20px 0"><div class="spinner"></div></div></div>
+    <div class="stat-card"><div class="loading" style="padding:20px 0"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- Recent bookings -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Đặt lịch gần đây</div>
+      <a href="dat-lich.html" class="link">Xem tất cả →</a>
+    </div>
+    <div class="table-wrapper">
+      <div id="bookings-container">
+        <div class="loading"><div class="spinner"></div> Đang tải...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('dashboard');
+
+  async function loadDashboard() {
+    const [xeRes, tinTucRes, datLichRes] = await Promise.all([
+      API.getXe(),
+      API.getTinTuc(),
+      API.getDatLich()
+    ]);
+
+    const xe      = (xeRes      && xeRes.ok      && Array.isArray(xeRes.data.data))      ? xeRes.data.data      : [];
+    const tinTuc  = (tinTucRes  && tinTucRes.ok  && Array.isArray(tinTucRes.data.data))  ? tinTucRes.data.data  : [];
+    const datLich = (datLichRes && datLichRes.ok && Array.isArray(datLichRes.data.data)) ? datLichRes.data.data : [];
+
+    const choXacNhan = datLich.filter(d => d.trang_thai === 'Chờ xử lý').length;
+    const hoanThanh  = datLich.filter(d => d.trang_thai === 'Hoàn thành').length;
+
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <span class="stat-icon">🚗</span>
+        <div class="stat-value">${xe.length}</div>
+        <div class="stat-label">Tổng số xe</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📰</span>
+        <div class="stat-value">${tinTuc.length}</div>
+        <div class="stat-label">Tổng tin tức</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⏳</span>
+        <div class="stat-value">${choXacNhan}</div>
+        <div class="stat-label">Chờ xác nhận</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <div class="stat-value">${hoanThanh}</div>
+        <div class="stat-label">Đã hoàn thành</div>
+      </div>
+    `;
+
+    const container = document.getElementById('bookings-container');
+    const recent = datLich.slice(0, 8);
+
+    if (recent.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-text">Chưa có đặt lịch nào</div>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Họ tên</th>
+            <th>Số điện thoại</th>
+            <th>Xe quan tâm</th>
+            <th>Ngày hẹn</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${recent.map(d => `
+            <tr>
+              <td>${d.ho_ten || '—'}</td>
+              <td>${d.so_dien_thoai || '—'}</td>
+              <td>${d.xe_quan_tam || '—'}</td>
+              <td>${formatDate(d.ngay_hen)}</td>
+              <td>${trangThaiBadge(d.trang_thai)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  loadDashboard();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt lịch lái thử — Showroom KIA</title>
+  <meta name="description" content="Đặt lịch lái thử xe KIA miễn phí tại showroom chính hãng.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      align-items: start;
+    }
+    .sidebar-card {
+      border: 1px solid var(--gray-line);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .sidebar-card h4 {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--black);
+      text-transform: none;
+    }
+    .sidebar-card p,
+    .sidebar-card li {
+      font-size: .85rem;
+      color: var(--gray-muted);
+      margin-bottom: 8px;
+      text-transform: none;
+    }
+    .sidebar-card ul { padding-left: 16px; }
+    .sidebar-card ul li { list-style: disc; }
+    .sidebar-info-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-line);
+      font-size: .88rem;
+    }
+    .sidebar-info-item:last-child { border-bottom: none; }
+    @media (max-width: 900px) {
+      .booking-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="page-top">
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html"    class="nav-link">Trang chủ</a>
+          <a href="xe.html"       class="nav-link">Dòng xe</a>
+          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
+          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Trang chủ</a>
+        <span>/</span>
+        <span>Đặt lịch lái thử</span>
+      </div>
+      <h1>Đặt lịch lái thử</h1>
+      <p>Trải nghiệm xe KIA miễn phí tại showroom — không ràng buộc, không mất phí.</p>
+    </div>
+  </div>
+
+  <!-- ═══ FORM SECTION ═══ -->
+  <section class="section">
+    <div class="container">
+      <div class="booking-layout">
+
+        <!-- form card -->
+        <div class="form-card reveal">
+          <h2 style="margin-bottom:8px">Thông tin đặt lịch</h2>
+          <p style="margin-bottom:28px">Điền đầy đủ thông tin bên dưới, chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.</p>
+
+          <div id="form-notice" class="form-notice"></div>
+
+          <form id="booking-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="ho_ten">Họ và tên <span class="req">*</span></label>
+                <input type="text" id="ho_ten" class="form-control" placeholder="Nguyễn Văn A" autocomplete="name">
+                <div class="field-err" id="err-ho_ten">Vui lòng nhập họ tên.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="so_dien_thoai">Số điện thoại <span class="req">*</span></label>
+                <input type="tel" id="so_dien_thoai" class="form-control" placeholder="0909 123 456" autocomplete="tel"
+                  oninput="clearPhoneError()"
+                  onblur="setPhoneError(validatePhone(this.value))">
+                <div class="field-error" id="error-so_dien_thoai"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="email@example.com" autocomplete="email">
+                <div class="field-err" id="err-email">Email không hợp lệ.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="xe_quan_tam">Xe quan tâm</label>
+                <input type="text" id="xe_quan_tam" class="form-control" placeholder="KIA Sportage, KIA EV6...">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ngay_hen">Ngày hẹn <span class="req">*</span></label>
+              <input type="date" id="ngay_hen" class="form-control">
+              <div class="field-err" id="err-ngay_hen">Vui lòng chọn ngày hẹn hợp lệ.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ghi_chu">Ghi chú</label>
+              <textarea id="ghi_chu" class="form-control" placeholder="Yêu cầu thêm, câu hỏi..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%;justify-content:center">
+              Xác nhận đặt lịch
+            </button>
+          </form>
+        </div>
+
+        <!-- sidebar -->
+        <div class="reveal reveal-d1">
+          <div class="sidebar-card" style="margin-bottom:16px">
+            <h4>Quy trình đặt lịch</h4>
+            <ul>
+              <li>Điền thông tin và gửi form</li>
+              <li>Nhân viên liên hệ xác nhận trong 2 giờ</li>
+              <li>Đến showroom đúng giờ hẹn</li>
+              <li>Lái thử xe miễn phí</li>
+            </ul>
+          </div>
+          <div class="sidebar-card" style="margin-bottom:16px">
+            <h4>Lưu ý</h4>
+            <ul>
+              <li>Mang CMND/CCCD và bằng lái xe</li>
+              <li>Hoàn toàn miễn phí, không ràng buộc</li>
+              <li>Có thể hủy/đổi lịch trước 24 giờ</li>
+            </ul>
+          </div>
+          <div class="sidebar-card" id="sidebar-contact" style="display:none">
+            <h4>Liên hệ trực tiếp</h4>
+            <div id="sidebar-info"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+    initScrollReveal();
+
+    /* pre-fill xe_quan_tam from URL */
+    const xeParam = getParam('xe');
+    if (xeParam) document.getElementById('xe_quan_tam').value = xeParam;
+
+    /* min date = today */
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('ngay_hen').min = today;
+
+    /* load showroom contact for sidebar */
+    (async function loadSidebarContact() {
+      const data = await apiFetch('/cai-dat');
+      if (!data) return;
+      const items = [
+        data.dia_chi       && `<div class="sidebar-info-item"><span>📍</span><span>${data.dia_chi}</span></div>`,
+        data.so_dien_thoai && `<div class="sidebar-info-item"><span>📞</span><a href="tel:${data.so_dien_thoai}">${data.so_dien_thoai}</a></div>`,
+        data.gio_lam_viec  && `<div class="sidebar-info-item"><span>🕐</span><span>${data.gio_lam_viec}</span></div>`,
+      ].filter(Boolean);
+      if (items.length) {
+        document.getElementById('sidebar-info').innerHTML = items.join('');
+        document.getElementById('sidebar-contact').style.display = '';
+      }
+    })();
+
+    /* validation helpers */
+    function clearPhoneError() {
+      document.getElementById('error-so_dien_thoai').textContent = '';
+      document.getElementById('so_dien_thoai').classList.remove('is-err');
+    }
+    function setPhoneError(msg) {
+      document.getElementById('error-so_dien_thoai').textContent = msg || '';
+      if (msg) document.getElementById('so_dien_thoai').classList.add('is-err');
+      else document.getElementById('so_dien_thoai').classList.remove('is-err');
+    }
+    function clearErrors() {
+      document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-err'));
+      document.querySelectorAll('.field-err').forEach(el => el.classList.remove('show'));
+      clearPhoneError();
+    }
+    function showFieldError(fieldId, errId) {
+      document.getElementById(fieldId).classList.add('is-err');
+      document.getElementById(errId).classList.add('show');
+    }
+
+    function validate() {
+      clearErrors();
+      let ok = true;
+
+      const hoTen = document.getElementById('ho_ten').value.trim();
+      if (!hoTen) { showFieldError('ho_ten', 'err-ho_ten'); ok = false; }
+
+      const sdt = document.getElementById('so_dien_thoai').value.trim();
+      const phoneErr = validatePhone(sdt);
+      if (phoneErr) { setPhoneError(phoneErr); ok = false; }
+
+      const email = document.getElementById('email').value.trim();
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showFieldError('email', 'err-email'); ok = false; }
+
+      const ngay = document.getElementById('ngay_hen').value;
+      if (!ngay || ngay < today) { showFieldError('ngay_hen', 'err-ngay_hen'); ok = false; }
+
+      return ok;
+    }
+
+    /* submit */
+    document.getElementById('booking-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const notice = document.getElementById('form-notice');
+      const btn    = document.getElementById('submit-btn');
+      notice.style.display = 'none';
+      btn.disabled    = true;
+      btn.textContent = 'Đang gửi...';
+
+      const payload = {
+        ho_ten:        document.getElementById('ho_ten').value.trim(),
+        so_dien_thoai: document.getElementById('so_dien_thoai').value.trim(),
+        email:         document.getElementById('email').value.trim() || undefined,
+        xe_quan_tam:   document.getElementById('xe_quan_tam').value.trim() || undefined,
+        ngay_hen:      document.getElementById('ngay_hen').value,
+        ghi_chu:       document.getElementById('ghi_chu').value.trim() || undefined,
+      };
+
+      const result = await apiPost('/dat-lich', payload);
+
+      btn.disabled    = false;
+      btn.textContent = 'Xác nhận đặt lịch';
+
+      if (result && (result.data || result.message)) {
+        notice.className = 'form-notice success';
+        notice.textContent = '✅ Đặt lịch thành công! Chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.';
+        notice.style.display = 'block';
+        this.reset();
+        if (xeParam) document.getElementById('xe_quan_tam').value = xeParam;
+        window.scrollTo({ top: notice.offsetTop - 100, behavior: 'smooth' });
+      } else {
+        notice.className = 'form-notice error';
+        notice.textContent = '❌ Đặt lịch thất bại. Vui lòng thử lại hoặc liên hệ trực tiếp.';
+        notice.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KIA Showroom — Trang chủ</title>
+  <meta name="description"
+    content="Showroom KIA chính hãng. Khám phá các dòng xe KIA mới nhất, đặt lịch lái thử miễn phí.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html" class="nav-link">Trang chủ</a>
+          <a href="xe.html" class="nav-link">Sản phẩm</a>
+          <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+          <a href="lien-he.html" class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Showroom KIA Chính Hãng</span>
+        <h1>Khám phá<br>dòng xe KIA</h1>
+        <p>Trải nghiệm công nghệ tiên tiến, thiết kế hiện đại và sự an toàn vượt trội trong từng chuyến đi.</p>
+        <div class="hero-actions">
+          <a href="xe.html" class="btn btn-primary">Xem tất cả xe</a>
+          <a href="dat-lich.html" class="btn btn-outline">Đặt lịch lái thử</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">Cuộn xuống</div>
+  </section>
+
+  <!-- ═══ FEATURED CARS ═══ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Xe nổi bật</h2>
+        <p>Những mẫu xe KIA được yêu thích nhất tại showroom, thiết kế đẳng cấp và công nghệ hiện đại.</p>
+      </div>
+      <div class="card-grid" id="featured-cars"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURED NEWS ═══ -->
+  <section class="section section--gray">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Tin tức mới nhất</h2>
+        <p>Cập nhật thông tin về sản phẩm mới, khuyến mãi và sự kiện từ KIA.</p>
+      </div>
+      <div class="card-grid" id="featured-news"></div>
+      <div style="text-align:center;margin-top:40px" class="reveal">
+        <a href="tin-tuc.html" class="btn btn-outline-dark">Xem tất cả tin tức</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE ẢNH KHÁCH HÀNG ═══ -->
+  <section class="section slide-section reveal" id="slide-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Khách hàng KIA</h2>
+        <p class="section-sub">Những khoảnh khắc đáng nhớ</p>
+      </div>
+      <div class="slide-viewport" id="slide-viewport">
+        <div class="slide-track" id="slide-track"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TƯ VẤN NHANH ═══ -->
+  <section class="tuvan-nhanh-section">
+    <div class="container">
+      <div class="tuvan-nhanh-wrap">
+        <div class="tuvan-nhanh-label">Tư vấn nhanh</div>
+        <div class="tuvan-nhanh-form">
+          <input type="text" class="tuvan-input" id="tuvan-hoten" placeholder="Họ và tên *">
+          <input type="tel" class="tuvan-input" id="tuvan-sdt" placeholder="Số điện thoại *">
+          <button class="tuvan-btn" onclick="submitTuVanNhanh()">Đăng ký</button>
+        </div>
+        <div class="tuvan-msg" id="tuvan-msg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA BANNER ═══ -->
+  <section class="cta-banner reveal">
+    <div class="container">
+      <h2>Đặt lịch lái thử ngay hôm nay</h2>
+      <p>Trải nghiệm cảm giác lái xe KIA miễn phí tại showroom của chúng tôi.</p>
+      <a href="dat-lich.html" class="btn btn-primary">Đặt lịch ngay</a>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <!-- ═══ POPUP TƯ VẤN ═══ -->
+  <div class="popup-overlay" id="popup-tuvan" style="display:none">
+    <div class="popup-box" onclick="event.stopPropagation()">
+      <button class="popup-close" onclick="closePopup()">✕</button>
+      <div class="popup-badge">Tư vấn miễn phí</div>
+      <h2 class="popup-title">Để lại thông tin<br>nhận tư vấn ngay</h2>
+      <p class="popup-sub">Chuyên viên KIA sẽ liên hệ trong 24 giờ</p>
+      <div class="field-error" id="popup-error"></div>
+      <input type="text" class="popup-input" id="popup-hoten" placeholder="Họ và tên *">
+      <div class="field-error" id="popup-error-sdt"></div>
+      <input type="tel" class="popup-input" id="popup-sdt" placeholder="Số điện thoại *">
+      <select class="popup-input" id="popup-xe">
+        <option value="">-- Xe quan tâm --</option>
+      </select>
+      <button class="popup-btn" onclick="submitPopup()">Đăng ký tư vấn</button>
+      <div class="popup-success" id="popup-success" style="display:none">
+        ✅ Cảm ơn! Chúng tôi sẽ liên hệ sớm nhất.
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+
+    // ═══ POPUP TƯ VẤN ═══
+    const popupOverlay = document.getElementById('popup-tuvan');
+
+    // Load xe list into popup select
+    (async function loadPopupXeList() {
+      const xe = await apiFetch('/xe');
+      const sel = document.getElementById('popup-xe');
+      if (xe && xe.length) {
+        xe.forEach(x => {
+          const opt = document.createElement('option');
+          opt.value = x.ten_xe;
+          opt.textContent = x.ten_xe;
+          sel.appendChild(opt);
+        });
+      }
+    })();
+
+    // Show popup after 1.5s if 5 minutes have passed since last shown
+    const POPUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    const lastShown = localStorage.getItem('tu_van_last_shown');
+    const now = Date.now();
+    if (!lastShown || (now - parseInt(lastShown)) >= POPUP_INTERVAL) {
+      setTimeout(() => {
+        popupOverlay.style.display = 'flex';
+      }, 1500);
+    }
+
+    // Close when clicking outside the popup box
+    popupOverlay.addEventListener('click', function (e) {
+      if (e.target === this) closePopup();
+    });
+
+    function closePopup() {
+      popupOverlay.classList.add('hidden');
+      localStorage.setItem('tu_van_last_shown', Date.now().toString());
+    }
+
+    async function submitPopup() {
+      const ho_ten = document.getElementById('popup-hoten').value.trim();
+      const so_dien_thoai = document.getElementById('popup-sdt').value.trim();
+      const xe_quan_tam = document.getElementById('popup-xe').value;
+      const errEl = document.getElementById('popup-error');
+      const errSdtEl = document.getElementById('popup-error-sdt');
+
+      errEl.textContent = '';
+      errSdtEl.textContent = '';
+
+      if (!ho_ten) { errEl.textContent = 'Vui lòng nhập họ tên'; return; }
+
+      const phoneErr = validatePhone(so_dien_thoai);
+      if (phoneErr) { errSdtEl.textContent = phoneErr; return; }
+
+      const res = await apiPost('/dat-lich', {
+        ho_ten,
+        so_dien_thoai,
+        xe_quan_tam,
+        ghi_chu: 'Đăng ký tư vấn từ popup'
+      });
+
+      if (res && (res.message || res.data)) {
+        const successEl = document.getElementById('popup-success');
+        successEl.style.display = 'block';
+        setTimeout(() => closePopup(), 2000);
+      } else {
+        errEl.textContent = 'Có lỗi xảy ra, vui lòng thử lại.';
+      }
+    }
+
+    // ═══ SLIDE ẢNH KHÁCH HÀNG ═══
+    const VISIBLE_COUNT = 3;
+    const SLIDE_INTERVAL = 1800;
+    const GAP = 16;
+
+    let slides = [];
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let slideTimer = null;
+    let itemWidth = 0;
+
+    async function loadSlides() {
+      const data = await apiFetch('/anh-slide');
+      slides = data || [];
+
+      if (!slides.length) {
+        const section = document.getElementById('slide-section');
+        if (section) section.style.display = 'none';
+        return;
+      }
+
+      buildSlider();
+      startAutoSlide();
+    }
+
+    function buildSlider() {
+      const track = document.getElementById('slide-track');
+      if (!track) return;
+
+      const prepend = slides.slice(-VISIBLE_COUNT);
+      const append = slides.slice(0, VISIBLE_COUNT);
+      const all = [...prepend, ...slides, ...append];
+
+      track.innerHTML = all.map(s => `
+        <div class="slide-item">
+          <img src="${imgSrc(s.url_anh)}" alt="Khách hàng KIA" loading="lazy"
+               onerror="this.parentElement.style.display='none'">
+        </div>
+      `).join('');
+
+      currentIndex = VISIBLE_COUNT;
+
+      requestAnimationFrame(() => {
+        const item = track.querySelector('.slide-item');
+        itemWidth = item ? item.offsetWidth + GAP : 0;
+        updatePosition(false);
+      });
+    }
+
+    function updatePosition(animate = true) {
+      const track = document.getElementById('slide-track');
+      if (!track || !itemWidth) return;
+      track.style.transition = animate
+        ? 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        : 'none';
+      track.style.transform = `translateX(-${currentIndex * itemWidth}px)`;
+    }
+
+    function slideNext() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      currentIndex++;
+      updatePosition(true);
+      setTimeout(() => {
+        if (currentIndex >= VISIBLE_COUNT + slides.length) {
+          currentIndex = VISIBLE_COUNT;
+          updatePosition(false);
+        }
+        isTransitioning = false;
+      }, 360);
+    }
+
+    function slidePrev() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      currentIndex--;
+      updatePosition(true);
+      setTimeout(() => {
+        if (currentIndex < VISIBLE_COUNT) {
+          currentIndex = VISIBLE_COUNT + slides.length - 1;
+          updatePosition(false);
+        }
+        isTransitioning = false;
+      }, 360);
+    }
+
+
+    function startAutoSlide() {
+      slideTimer = setInterval(slideNext, SLIDE_INTERVAL);
+    }
+
+    function resetAutoSlide() {
+      clearInterval(slideTimer);
+      startAutoSlide();
+    }
+
+
+    window.addEventListener('resize', () => {
+      const track = document.getElementById('slide-track');
+      const item = track && track.querySelector('.slide-item');
+      if (item) {
+        itemWidth = item.offsetWidth + GAP;
+        updatePosition(false);
+      }
+    });
+
+    loadSlides();
+
+    // ═══ TƯ VẤN NHANH ═══
+    function submitTuVanNhanh() {
+      const ho_ten = document.getElementById('tuvan-hoten').value.trim();
+      const so_dien_thoai = document.getElementById('tuvan-sdt').value.trim();
+      const msgEl = document.getElementById('tuvan-msg');
+
+      if (!ho_ten) { msgEl.textContent = 'Vui lòng nhập họ tên'; msgEl.style.color = '#bb162b'; return; }
+
+      const phoneErr = validatePhone(so_dien_thoai);
+      if (phoneErr) { msgEl.textContent = phoneErr; msgEl.style.color = '#bb162b'; return; }
+
+      apiPost('/dat-lich', {
+        ho_ten, so_dien_thoai, ghi_chu: 'Đăng ký tư vấn nhanh từ trang chủ'
+      }).then(res => {
+        if (res) {
+          msgEl.textContent = '✅ Đăng ký thành công! Chúng tôi sẽ liên hệ sớm nhất.';
+          msgEl.style.color = '#16a34a';
+          document.getElementById('tuvan-hoten').value = '';
+          document.getElementById('tuvan-sdt').value = '';
+        } else {
+          msgEl.textContent = '❌ Có lỗi xảy ra, vui lòng thử lại.';
+          msgEl.style.color = '#bb162b';
+        }
+      });
+    }
+
+    // ═══ FEATURED CARS ═══
+    (async function loadFeaturedCars() {
+      const el = document.getElementById('featured-cars');
+      el.innerHTML = spinnerHTML();
+      const cars = await apiFetch('/xe');
+      if (!cars || !cars.length) {
+        el.innerHTML = emptyHTML('Không có dữ liệu xe.');
+        return;
+      }
+      const featured = cars.filter(c => c.noi_bat);
+      const list = featured.length ? featured : cars;
+      el.innerHTML = list.map((xe, i) => {
+        const priceText = formatPriceRange(xe.PhienBans);
+        return `
+          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='xe-chi-tiet.html?id=${xe.id}'">
+            <div class="card-img-wrap">
+              ${imgTag(xe.anh_dai_dien, xe.ten_xe, '')}
+            </div>
+            <div class="card-body">
+              ${xe.loai_xe ? `<span class="card-badge">${xe.loai_xe}</span>` : ''}
+              <div class="card-title">${xe.ten_xe}</div>
+              <div class="card-price">${priceText}</div>
+              <span class="card-link">Xem chi tiết <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </div>`;
+      }).join('');
+      initScrollReveal();
+    })();
+
+    (async function loadFeaturedNews() {
+      const el = document.getElementById('featured-news');
+      el.innerHTML = spinnerHTML();
+      const news = await apiFetch('/tin-tuc');
+      if (!news || !news.length) {
+        el.innerHTML = emptyHTML('Không có tin tức.');
+        return;
+      }
+      const list = news.slice(0, 3);
+      el.innerHTML = list.map((t, i) => `
+        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='tin-chi-tiet.html?id=${t.id}'">
+          <div class="card-img-wrap">
+            ${imgTag(t.anh_dai_dien, t.tieu_de, '')}
+          </div>
+          <div class="card-body">
+            <div class="card-meta">${formatDate(t.created_at)}</div>
+            <div class="card-title">${t.tieu_de}</div>
+            <div class="card-desc">${t.tom_tat || ''}</div>
+            <span class="card-link">Đọc thêm <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>`).join('');
+      initScrollReveal();
+    })();
+
+    initScrollReveal();
+  </script>
+</body>
+
+</html>

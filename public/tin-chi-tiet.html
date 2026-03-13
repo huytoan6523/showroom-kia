@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin tức — Showroom KIA</title>
+  <meta name="description" content="Đọc tin tức mới nhất về các dòng xe KIA, ưu đãi và dịch vụ tại showroom.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-top">
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html"    class="nav-link">Trang chủ</a>
+          <a href="xe.html"       class="nav-link">Dòng xe</a>
+          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
+          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ CONTENT ═══ -->
+  <section class="section">
+    <div class="container">
+      <div id="article-content"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+
+    (async function init() {
+      const el = document.getElementById('article-content');
+      el.innerHTML = spinnerHTML();
+
+      const id = getParam('id');
+      if (!id) {
+        el.innerHTML = `<a href="tin-tuc.html" class="back-link">← Quay lại tin tức</a>${emptyHTML('Không tìm thấy bài viết.')}`;
+        return;
+      }
+
+      const article = await apiFetch('/tin-tuc/' + id);
+      if (!article) {
+        el.innerHTML = `<a href="tin-tuc.html" class="back-link">← Quay lại tin tức</a>${emptyHTML('Không thể tải bài viết.')}`
+        return;
+      }
+
+      document.title = article.tieu_de + ' — Showroom KIA';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', article.tom_tat ? article.tom_tat.substring(0, 160) : article.tieu_de);
+
+      const coverHTML = article.anh_dai_dien
+        ? `<img src="${imgSrc(article.anh_dai_dien)}" alt="${article.tieu_de}" class="article-cover"
+             onerror="this.style.display='none'">`
+        : '';
+
+      el.innerHTML = `
+        <a href="tin-tuc.html" class="back-link">← Quay lại tin tức</a>
+        <div class="article-wrap reveal">
+          ${coverHTML}
+          ${article.danh_muc ? `<span class="card-badge" style="display:inline-block;margin-bottom:12px">${article.danh_muc}</span>` : ''}
+          <div class="article-meta">
+            <span>KIA Showroom</span>
+            <span class="sep">•</span>
+            <span>${formatDate(article.created_at)}</span>
+          </div>
+          <h1 class="article-title">${article.tieu_de}</h1>
+          ${article.tom_tat ? `<p class="article-summary">${article.tom_tat}</p>` : ''}
+          <div class="article-body">
+            ${article.noi_dung
+              ? article.noi_dung.replace(/\n\n+/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')
+              : '<p>Nội dung đang được cập nhật.</p>'}
+          </div>
+          <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--gray-line);display:flex;gap:12px;flex-wrap:wrap">
+            <a href="dat-lich.html" class="btn btn-primary">Đặt lịch lái thử</a>
+            <a href="tin-tuc.html"  class="btn btn-outline-dark">Xem tin tức khác</a>
+          </div>
+        </div>`;
+
+      initScrollReveal();
+    })();
+  </script>
+</body>
+</html>

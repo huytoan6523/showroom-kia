@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý xe — KIA Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Quản lý xe</div>
+      <div class="page-subtitle">Thêm, sửa, xóa thông tin các dòng xe</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAdd()">+ Thêm xe mới</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Danh sách xe</div>
+      <div class="toolbar" style="margin-bottom:0">
+        <input type="text" class="search-input" id="search-input" placeholder="Tìm theo tên xe, phân loại...">
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="table-container">
+        <div class="loading"><div class="spinner"></div> Đang tải...</div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info" id="pagination-info"></div>
+      <div class="pagination-btns" id="pagination-btns"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" id="xe-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Thêm xe mới</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+
+        <!-- Row 1: ten_xe | loai_xe -->
+        <div class="form-group">
+          <label class="form-label" for="f-ten_xe" style="text-transform:none">Tên xe <span class="req">*</span></label>
+          <input type="text" class="form-control" id="f-ten_xe" placeholder="Ví dụ: KIA Sportage" style="text-transform:none">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-loai_xe" style="text-transform:none">Loại xe</label>
+          <select class="form-control" id="f-loai_xe" style="text-transform:none">
+            <option value="">-- Chọn loại xe --</option>
+            <option value="SUV">SUV</option>
+            <option value="Sedan">Sedan</option>
+            <option value="MPV">MPV</option>
+            <option value="Crossover">Crossover</option>
+            <option value="Hatchback">Hatchback</option>
+            <option value="Electric">Electric</option>
+            <option value="Pickup">Pickup</option>
+          </select>
+        </div>
+
+        <!-- Row 2: nam_san_xuat | nhien_lieu -->
+        <div class="form-group">
+          <label class="form-label" for="f-nam_san_xuat" style="text-transform:none">Năm sản xuất</label>
+          <input type="number" class="form-control" id="f-nam_san_xuat" min="2000" max="2030" placeholder="VD: 2024">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-nhien_lieu" style="text-transform:none">Nhiên liệu</label>
+          <input type="text" class="form-control" id="f-nhien_lieu" placeholder="VD: Xăng, Dầu, Điện, Hybrid" style="text-transform:none">
+        </div>
+
+        <!-- Row 3: dong_co | hop_so -->
+        <div class="form-group">
+          <label class="form-label" for="f-dong_co" style="text-transform:none">Động cơ</label>
+          <input type="text" class="form-control" id="f-dong_co" placeholder="Ví dụ: 2.0L Turbo" style="text-transform:none">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-hop_so" style="text-transform:none">Hộp số</label>
+          <input type="text" class="form-control" id="f-hop_so" placeholder="Ví dụ: 8AT" style="text-transform:none">
+        </div>
+
+        <!-- Row 4: so_cho_ngoi | muc_tieu_thu -->
+        <div class="form-group">
+          <label class="form-label" for="f-so_cho_ngoi" style="text-transform:none">Số chỗ ngồi</label>
+          <input type="number" class="form-control" id="f-so_cho_ngoi" min="2" max="9" placeholder="VD: 5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-muc_tieu_thu" style="text-transform:none">Mức tiêu thụ</label>
+          <input type="text" class="form-control" id="f-muc_tieu_thu" placeholder="VD: 7.1L/100km" style="text-transform:none">
+        </div>
+
+        <!-- Row 5: kich_thuoc full width -->
+        <div class="form-group full">
+          <label class="form-label" for="f-kich_thuoc" style="text-transform:none">Kích thước</label>
+          <input type="text" class="form-control" id="f-kich_thuoc" placeholder="VD: 4515 x 1865 x 1645 mm" style="text-transform:none">
+        </div>
+
+        <!-- Row 6: mo_ta full width -->
+        <div class="form-group full">
+          <label class="form-label" for="f-mo_ta" style="text-transform:none">Mô tả</label>
+          <textarea class="form-control" id="f-mo_ta" placeholder="Mô tả chi tiết về xe..." style="text-transform:none"></textarea>
+        </div>
+
+        <!-- Row 7: noi_bat | thu_tu -->
+        <div class="form-group">
+          <label class="form-label" for="f-noi_bat" style="text-transform:none">Nổi bật</label>
+          <select class="form-control" id="f-noi_bat">
+            <option value="0">Không</option>
+            <option value="1">Có</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-thu_tu" style="text-transform:none">Thứ tự hiển thị</label>
+          <input type="number" class="form-control" id="f-thu_tu" placeholder="0" min="0">
+        </div>
+
+        <!-- Row 8: image upload full width -->
+        <div class="form-group full">
+          <label class="form-label" style="text-transform:none">Ảnh đại diện</label>
+          <div class="upload-area" id="upload-area" onclick="document.getElementById('f-anh').click()">
+            <input type="file" id="f-anh" accept="image/*" style="display:none">
+            <span class="upload-label" id="upload-label">📷 Nhấn để chọn ảnh (JPG, PNG, WEBP)</span>
+            <img id="current-img" class="upload-preview" alt="">
+            <img id="img-preview" class="upload-preview" alt="">
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:20px;border-top:1px solid var(--gray-line);padding-top:16px">
+        <div style="font-weight:600;font-size:.9rem;margin-bottom:12px;text-transform:none">Phiên bản &amp; Giá</div>
+        <div id="phien-ban-section"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveXe()">Lưu xe</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  requireAuth();
+  initLayout('xe');
+
+  var allXe      = [];
+  var filteredXe = [];
+  var currentPage = 1;
+  var PAGE_SIZE   = 10;
+  var editingId   = null;
+
+  async function loadXe() {
+    document.getElementById('table-container').innerHTML =
+      '<div class="loading"><div class="spinner"></div> Đang tải...</div>';
+
+    var res = await API.getXe();
+    if (!res || !res.ok) {
+      document.getElementById('table-container').innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Không thể tải dữ liệu. Vui lòng thử lại.</div></div>';
+      return;
+    }
+
+    allXe = Array.isArray(res.data.data) ? res.data.data : [];
+    applyFilter();
+  }
+
+  function applyFilter() {
+    var q = document.getElementById('search-input').value.toLowerCase();
+    filteredXe = allXe.filter(function(x) {
+      return (x.ten_xe || '').toLowerCase().indexOf(q) !== -1 ||
+             (x.loai_xe || '').toLowerCase().indexOf(q) !== -1;
+    });
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  function renderTable() {
+    var start   = (currentPage - 1) * PAGE_SIZE;
+    var items   = filteredXe.slice(start, start + PAGE_SIZE);
+    var container = document.getElementById('table-container');
+
+    if (filteredXe.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state"><div class="empty-state-icon">🚗</div><div class="empty-state-text">Không tìm thấy xe nào</div></div>';
+      return;
+    }
+
+    var rows = items.map(function(xe) {
+      var imgCell = xe.anh_dai_dien
+        ? '<img class="table-img" src="' + imgSrc(xe.anh_dai_dien) + '" alt="" onerror="this.style.display=\'none\'">'
+        : '<div class="no-image">No img</div>';
+
+      var phanLoaiCell = xe.loai_xe
+        ? '<span class="badge badge-blue">' + xe.loai_xe + '</span>'
+        : '—';
+
+      var prices = (xe.PhienBans || []).map(function(p) { return Number(p.gia); }).filter(Boolean);
+      var giaTuCell = prices.length ? formatMoney(Math.min.apply(null, prices)) : '—';
+
+      var noiBatCell = xe.noi_bat
+        ? '<span class="badge badge-accent">Nổi bật</span>'
+        : '<span class="badge badge-gray">Không</span>';
+
+      return '<tr>' +
+        '<td>' + imgCell + '</td>' +
+        '<td>' + (xe.ten_xe || '—') + '</td>' +
+        '<td>' + phanLoaiCell + '</td>' +
+        '<td>' + giaTuCell + '</td>' +
+        '<td>' + noiBatCell + '</td>' +
+        '<td>' +
+          '<button class="btn btn-secondary btn-icon btn-sm" onclick="openEdit(' + xe.id + ')" title="Chỉnh sửa">✏️</button> ' +
+          '<button class="btn btn-danger btn-icon btn-sm" onclick="handleDelete(' + xe.id + ')" title="Xóa">🗑️</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    container.innerHTML =
+      '<table>' +
+        '<thead><tr>' +
+          '<th>Ảnh</th>' +
+          '<th>Tên xe</th>' +
+          '<th>Phân loại</th>' +
+          '<th>Giá từ</th>' +
+          '<th>Nổi bật</th>' +
+          '<th style="width:110px">Thao tác</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+  }
+
+  function renderPagination() {
+    var total      = filteredXe.length;
+    var totalPages = Math.ceil(total / PAGE_SIZE);
+    var start      = total > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0;
+    var end        = Math.min(currentPage * PAGE_SIZE, total);
+
+    document.getElementById('pagination-info').textContent =
+      total > 0 ? 'Hiển thị ' + start + '–' + end + ' / ' + total + ' xe' : 'Không có kết quả';
+
+    renderPaginationBtns('pagination-btns', currentPage, totalPages, 'changePage');
+  }
+
+  function changePage(page) {
+    var totalPages = Math.ceil(filteredXe.length / PAGE_SIZE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTable();
+    renderPagination();
+  }
+
+  function resetForm() {
+    document.getElementById('f-ten_xe').value      = '';
+    document.getElementById('f-loai_xe').value     = '';
+    document.getElementById('f-nam_san_xuat').value = '';
+    document.getElementById('f-nhien_lieu').value  = '';
+    document.getElementById('f-dong_co').value     = '';
+    document.getElementById('f-hop_so').value      = '';
+    document.getElementById('f-so_cho_ngoi').value = '';
+    document.getElementById('f-muc_tieu_thu').value = '';
+    document.getElementById('f-kich_thuoc').value  = '';
+    document.getElementById('f-mo_ta').value       = '';
+    document.getElementById('f-noi_bat').value     = '0';
+    document.getElementById('f-thu_tu').value      = '';
+    document.getElementById('f-anh').value         = '';
+    document.getElementById('img-preview').style.display  = 'none';
+    document.getElementById('current-img').style.display  = 'none';
+    document.getElementById('upload-label').style.display = 'block';
+    document.getElementById('save-btn').disabled    = false;
+    document.getElementById('save-btn').textContent = 'Lưu xe';
+  }
+
+  function openAdd() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Thêm xe mới';
+    resetForm();
+    pendingVersions = [];
+    renderPhienBanSection();
+    document.getElementById('xe-modal').classList.add('open');
+  }
+
+  async function openEdit(id) {
+    editingId = id;
+    document.getElementById('modal-title').textContent = 'Chỉnh sửa xe';
+    document.getElementById('save-btn').disabled    = false;
+    document.getElementById('save-btn').textContent = 'Lưu xe';
+
+    var res = await API.getXeById(id);
+    if (!res || !res.ok) {
+      showToast('Không thể tải thông tin xe', 'error');
+      return;
+    }
+
+    var xe = res.data.data;
+    document.getElementById('f-ten_xe').value       = xe.ten_xe        || '';
+    document.getElementById('f-loai_xe').value      = xe.loai_xe       || '';
+    document.getElementById('f-nam_san_xuat').value = xe.nam_san_xuat  || '';
+    document.getElementById('f-nhien_lieu').value   = xe.nhien_lieu    || '';
+    document.getElementById('f-dong_co').value      = xe.dong_co       || '';
+    document.getElementById('f-hop_so').value       = xe.hop_so        || '';
+    document.getElementById('f-so_cho_ngoi').value  = xe.so_cho_ngoi   || '';
+    document.getElementById('f-muc_tieu_thu').value = xe.muc_tieu_thu  || '';
+    document.getElementById('f-kich_thuoc').value   = xe.kich_thuoc    || '';
+    document.getElementById('f-mo_ta').value        = xe.mo_ta         || '';
+    document.getElementById('f-noi_bat').value      = xe.noi_bat ? '1' : '0';
+    document.getElementById('f-thu_tu').value       = '';
+    document.getElementById('f-anh').value          = '';
+    document.getElementById('img-preview').style.display = 'none';
+
+    var currentImg = document.getElementById('current-img');
+    if (xe.anh_dai_dien) {
+      currentImg.src = imgSrc(xe.anh_dai_dien);
+      currentImg.style.display = 'block';
+      document.getElementById('upload-label').style.display = 'none';
+    } else {
+      currentImg.style.display = 'none';
+      document.getElementById('upload-label').style.display = 'block';
+    }
+
+    pendingVersions = (xe.PhienBans || []).map(function(pb) {
+      return { id: pb.id, ten_phien_ban: pb.ten_phien_ban || '', gia: Number(pb.gia) || 0, thu_tu: Number(pb.thu_tu) || 0, _status: 'existing' };
+    });
+    renderPhienBanSection();
+    document.getElementById('xe-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('xe-modal').classList.remove('open');
+  }
+
+  document.getElementById('f-anh').addEventListener('change', function() {
+    var file = this.files[0];
+    if (file) {
+      var preview = document.getElementById('img-preview');
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+      document.getElementById('current-img').style.display  = 'none';
+      document.getElementById('upload-label').style.display = 'none';
+    }
+  });
+
+  async function saveXe() {
+    var tenXe = document.getElementById('f-ten_xe').value.trim();
+    if (!tenXe) {
+      showToast('Vui lòng nhập tên xe', 'warning');
+      return;
+    }
+
+    var body = {
+      ten_xe:       tenXe,
+      loai_xe:      document.getElementById('f-loai_xe').value      || null,
+      nam_san_xuat: Number(document.getElementById('f-nam_san_xuat').value) || null,
+      mo_ta:        document.getElementById('f-mo_ta').value         || null,
+      dong_co:      document.getElementById('f-dong_co').value       || null,
+      hop_so:       document.getElementById('f-hop_so').value        || null,
+      nhien_lieu:   document.getElementById('f-nhien_lieu').value    || null,
+      so_cho_ngoi:  Number(document.getElementById('f-so_cho_ngoi').value) || null,
+      muc_tieu_thu: document.getElementById('f-muc_tieu_thu').value  || null,
+      kich_thuoc:   document.getElementById('f-kich_thuoc').value    || null,
+      noi_bat:      document.getElementById('f-noi_bat').value === '1',
+    };
+
+    var saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled    = true;
+    saveBtn.textContent = 'Đang lưu...';
+
+    var res = editingId ? await API.updateXe(editingId, body) : await API.createXe(body);
+
+    if (!res || !res.ok) {
+      showToast((res && res.data && res.data.message) || 'Lỗi khi lưu dữ liệu', 'error');
+      saveBtn.disabled    = false;
+      saveBtn.textContent = 'Lưu xe';
+      return;
+    }
+
+    var savedId = editingId ||
+      (res.data && res.data.data && res.data.data.id);
+
+    var fileInput = document.getElementById('f-anh');
+    if (fileInput.files.length > 0 && savedId) {
+      var fd = new FormData();
+      fd.append('image', fileInput.files[0]);
+      var uploadRes = await API.uploadAnhDaiDien(savedId, fd);
+      if (!uploadRes || !uploadRes.ok) {
+        showToast('Lưu thành công nhưng upload ảnh thất bại', 'warning');
+      }
+    }
+
+    if (savedId && editingId) {
+      await saveVersions(savedId);
+    }
+
+    if (editingId) {
+      showToast('Cập nhật xe thành công');
+      closeModal();
+      loadXe();
+    } else {
+      showToast('Thêm xe mới thành công');
+      closeModal();
+      loadXe();
+      if (savedId) openEdit(savedId);
+    }
+  }
+
+  function handleDelete(id) {
+    var xe = allXe.filter(function(x) { return x.id === id; })[0];
+    var name = xe ? xe.ten_xe : '';
+    showConfirm('Bạn có chắc muốn xóa xe "' + name + '"?', async function() {
+      var res = await API.deleteXe(id);
+      if (res && res.ok) {
+        showToast('Đã xóa xe thành công');
+        loadXe();
+      } else {
+        showToast('Không thể xóa xe này', 'error');
+      }
+    });
+  }
+
+  document.getElementById('search-input').addEventListener('input', applyFilter);
+
+  document.getElementById('xe-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  var pendingVersions = [];
+
+  function escHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderPhienBanSection() {
+    var container = document.getElementById('phien-ban-section');
+    if (editingId === null) {
+      container.innerHTML = '<div style="color:var(--muted);font-size:.85rem;text-transform:none">Lưu xe trước, sau đó thêm phiên bản.</div>';
+      return;
+    }
+    var rows = pendingVersions.map(function(v, i) {
+      if (v._status === 'deleted') return '';
+      return '<tr>' +
+        '<td style="padding:4px 6px"><input type="text" class="form-control" data-idx="' + i + '" data-field="ten_phien_ban" value="' + escHtml(v.ten_phien_ban) + '" style="text-transform:none" placeholder="Tên phiên bản" oninput="pbInput(this)"></td>' +
+        '<td style="padding:4px 6px"><input type="number" class="form-control" data-idx="' + i + '" data-field="gia" value="' + (Number(v.gia) || 0) + '" placeholder="Giá (VNĐ)" oninput="pbInput(this)"></td>' +
+        '<td style="padding:4px 6px"><input type="number" class="form-control" data-idx="' + i + '" data-field="thu_tu" value="' + (v.thu_tu || 0) + '" placeholder="Thứ tự" style="width:70px" oninput="pbInput(this)"></td>' +
+        '<td style="padding:4px 6px;white-space:nowrap">' +
+          '<button class="btn btn-danger btn-sm" onclick="pbDelete(' + i + ')">Xóa</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+    var hasVisible = pendingVersions.some(function(v) { return v._status !== 'deleted'; });
+    container.innerHTML =
+      (hasVisible
+        ? '<table style="width:100%;border-collapse:collapse;font-size:.85rem">' +
+            '<thead><tr>' +
+              '<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-line);font-weight:600;text-transform:none">Tên phiên bản</th>' +
+              '<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-line);font-weight:600;text-transform:none">Giá (VNĐ)</th>' +
+              '<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-line);font-weight:600;text-transform:none">Thứ tự</th>' +
+              '<th style="width:80px;padding:6px 8px;border-bottom:1px solid var(--gray-line)"></th>' +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table>'
+        : '<div style="color:var(--muted);font-size:.85rem;text-transform:none;margin-bottom:8px">Chưa có phiên bản nào.</div>') +
+      '<div style="margin-top:10px">' +
+        '<button class="btn btn-secondary btn-sm" onclick="pbAdd()">+ Thêm phiên bản</button>' +
+      '</div>';
+  }
+
+  function pbInput(input) {
+    var i     = Number(input.getAttribute('data-idx'));
+    var field = input.getAttribute('data-field');
+    pendingVersions[i][field] = input.value;
+    if (pendingVersions[i]._status === 'existing') {
+      pendingVersions[i]._status = 'edited';
+    }
+  }
+
+  function pbDelete(i) {
+    pendingVersions[i]._status = 'deleted';
+    renderPhienBanSection();
+  }
+
+  function pbAdd() {
+    pendingVersions.push({ id: null, ten_phien_ban: '', gia: 0, thu_tu: 0, _status: 'new' });
+    renderPhienBanSection();
+  }
+
+  async function saveVersions(xe_id) {
+    for (var i = 0; i < pendingVersions.length; i++) {
+      var v = pendingVersions[i];
+      if (v._status === 'new' && v.ten_phien_ban) {
+        await API.createPhienBan(xe_id, {
+          ten_phien_ban: v.ten_phien_ban,
+          gia: Number(v.gia) || 0,
+          thu_tu: Number(v.thu_tu) || 0
+        });
+      } else if (v._status === 'edited' && v.id) {
+        await API.updatePhienBan(xe_id, v.id, {
+          ten_phien_ban: v.ten_phien_ban,
+          gia: Number(v.gia) || 0,
+          thu_tu: Number(v.thu_tu) || 0
+        });
+      } else if (v._status === 'deleted' && v.id) {
+        await API.deletePhienBan(xe_id, v.id);
+      }
+    }
+  }
+
+  loadXe();
+</script>
+
+</body>
+</html>

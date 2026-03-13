@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liên hệ — Showroom KIA</title>
+  <meta name="description" content="Liên hệ với showroom KIA chính hãng. Địa chỉ, điện thoại, email và giờ làm việc.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-top">
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <div id="nav-menu">
+          <a href="index.html"    class="nav-link">Trang chủ</a>
+          <a href="xe.html"       class="nav-link">Dòng xe</a>
+          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
+          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+        </div>
+        <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Trang chủ</a>
+        <span>/</span>
+        <span>Liên hệ</span>
+      </div>
+      <h1>Liên hệ &amp; Giới thiệu</h1>
+      <p>Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn.</p>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <section class="section">
+    <div class="container">
+      <div id="contact-loading" style="text-align:center;padding:40px 0"></div>
+      <div class="contact-layout" id="contact-layout" style="display:none">
+
+        <!-- left: info -->
+        <div class="reveal">
+          <div class="section-header" style="margin-bottom:32px">
+            <h2 id="showroom-name">KIA Showroom</h2>
+            <p id="showroom-desc"></p>
+          </div>
+
+          <div id="contact-info-blocks"></div>
+
+          <div class="map-wrap">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3711.234!2d106.3167929!3d20.4389873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135e535692a7667:0x5240a5f8491d89ee!2zS2lhIFRow6FpIELDrG5o!5e0!3m2!1svi!2svn!4v1234567890"
+              width="100%"
+              height="400"
+              style="border:0; border-radius:8px;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Bản đồ vị trí showroom">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- right: quick contact form -->
+        <div class="reveal reveal-d1">
+          <div class="form-card">
+            <h3 style="margin-bottom:8px">Liên hệ nhanh</h3>
+            <p style="margin-bottom:24px;font-size:.88rem">Gửi thông tin, chúng tôi sẽ phản hồi sớm nhất.</p>
+
+            <div id="contact-form-notice" class="form-notice"></div>
+
+            <form id="contact-form" novalidate>
+              <div class="form-group">
+                <label class="form-label" for="c_ho_ten">Họ và tên <span class="req">*</span></label>
+                <input type="text" id="c_ho_ten" class="form-control" placeholder="Nguyễn Văn A" autocomplete="name">
+                <div class="field-err" id="cerr-ho_ten">Vui lòng nhập họ tên.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="c_so_dien_thoai">Số điện thoại <span class="req">*</span></label>
+                <input type="tel" id="c_so_dien_thoai" class="form-control" placeholder="0909 123 456" autocomplete="tel"
+                  oninput="showFieldError('so_dien_thoai', '')"
+                  onblur="const e=validatePhone(this.value); showFieldError('so_dien_thoai', e||'')">
+                <div class="field-error" id="error-so_dien_thoai"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="c_xe_quan_tam">Xe quan tâm</label>
+                <input type="text" id="c_xe_quan_tam" class="form-control" placeholder="KIA Sportage, KIA EV6...">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="c_ghi_chu">Nội dung</label>
+                <textarea id="c_ghi_chu" class="form-control" rows="3" placeholder="Câu hỏi hoặc yêu cầu của bạn..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="c_submit-btn" style="width:100%">
+                Gửi liên hệ
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer"></footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    initNav();
+    loadFooter();
+
+    (async function loadContactInfo() {
+      const loading = document.getElementById('contact-loading');
+      loading.innerHTML = spinnerHTML();
+
+      const data = await apiFetch('/cai-dat');
+
+      loading.innerHTML = '';
+      document.getElementById('contact-layout').style.display = '';
+
+      if (!data) {
+        document.getElementById('contact-info-blocks').innerHTML =
+          '<p style="color:var(--gray-muted)">Không thể tải thông tin liên hệ.</p>';
+        return;
+      }
+
+      /* heading */
+      if (data.ten_cong_ty) document.getElementById('showroom-name').textContent = data.ten_cong_ty;
+      if (data.gioi_thieu)  document.getElementById('showroom-desc').textContent = data.gioi_thieu;
+
+      /* info blocks */
+      const fields = [
+        { label: 'Địa chỉ',        icon: '📍', value: data.dia_chi,       link: null },
+        { label: 'Điện thoại',      icon: '📞', value: data.so_dien_thoai, link: data.so_dien_thoai ? 'tel:' + data.so_dien_thoai : null },
+        { label: 'Email',           icon: '✉️',  value: data.email,         link: data.email ? 'mailto:' + data.email : null },
+        { label: 'Giờ làm việc',    icon: '🕐', value: data.gio_lam_viec,  link: null },
+        { label: 'Facebook',        icon: '🌐', value: data.facebook ? 'Trang Facebook' : null, link: data.facebook },
+        { label: 'Zalo',            icon: '💬', value: data.zalo,          link: data.zalo ? 'https://zalo.me/' + data.zalo : null },
+      ].filter(f => f.value);
+
+      document.getElementById('contact-info-blocks').innerHTML = fields.map(f => `
+        <div class="info-block">
+          <div class="info-block-label">${f.label}</div>
+          <div class="info-block-value">
+            ${f.icon}&nbsp;
+            ${f.link
+              ? `<a href="${f.link}"${f.link.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${f.value}</a>`
+              : f.value}
+          </div>
+        </div>`).join('');
+
+      initScrollReveal();
+    })();
+
+    /* quick contact form validation + submit */
+    function showFieldError(fieldName, message) {
+      const el = document.getElementById('error-' + fieldName);
+      if (el) el.textContent = message || '';
+    }
+    function clearFieldErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+    }
+    function clearCErr() {
+      document.querySelectorAll('#contact-form .form-control').forEach(el => el.classList.remove('is-err'));
+      document.querySelectorAll('#contact-form .field-err').forEach(el => el.classList.remove('show'));
+      clearFieldErrors();
+    }
+    function showCErr(fieldId, errId) {
+      document.getElementById(fieldId).classList.add('is-err');
+      document.getElementById(errId).classList.add('show');
+    }
+
+    document.getElementById('contact-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearCErr();
+      let ok = true;
+
+      const hoTen = document.getElementById('c_ho_ten').value.trim();
+      if (!hoTen) { showCErr('c_ho_ten', 'cerr-ho_ten'); ok = false; }
+
+      const sdt = document.getElementById('c_so_dien_thoai').value.trim();
+      const phoneErr = validatePhone(sdt);
+      if (phoneErr) { showFieldError('so_dien_thoai', phoneErr); ok = false; }
+
+      if (!ok) return;
+
+      const notice = document.getElementById('contact-form-notice');
+      const btn    = document.getElementById('c_submit-btn');
+      notice.style.display = 'none';
+      btn.disabled    = true;
+      btn.textContent = 'Đang gửi...';
+
+      const payload = {
+        ho_ten:        hoTen,
+        so_dien_thoai: sdt,
+        xe_quan_tam:   document.getElementById('c_xe_quan_tam').value.trim() || undefined,
+        ghi_chu:       document.getElementById('c_ghi_chu').value.trim()    || undefined,
+      };
+
+      const result = await apiPost('/dat-lich', payload);
+
+      btn.disabled    = false;
+      btn.textContent = 'Gửi liên hệ';
+
+      if (result && (result.data || result.message)) {
+        notice.className     = 'form-notice success';
+        notice.textContent   = '✅ Gửi thành công! Chúng tôi sẽ liên hệ bạn sớm nhất.';
+        notice.style.display = 'block';
+        this.reset();
+      } else {
+        notice.className     = 'form-notice error';
+        notice.textContent   = '❌ Gửi thất bại. Vui lòng thử lại hoặc gọi điện trực tiếp.';
+        notice.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
