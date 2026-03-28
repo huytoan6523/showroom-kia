@@ -73,4 +73,18 @@ router.post('/login', authController.login);
  */
 router.put('/doi-mat-khau', authMiddleware, authController.doiMatKhau);
 
+// [NEW] API Tạo tài khoản Admin trực tiếp từ trang đăng nhập (Theo yêu cầu)
+router.post('/register', authController.register);
+
+// [DIAGNOSTIC] Kiểm tra kết nối DB và đọc sạch ghi
+router.get('/ping-db', async (req, res) => {
+  try {
+    const { Admin } = require('../models');
+    const count = await Admin.count();
+    res.json({ ok: true, admin_count: count, message: 'DB kết nối tốt!' });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: 'Lỗi query DB: ' + err.message });
+  }
+});
+
 module.exports = router;

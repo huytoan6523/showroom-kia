@@ -45,7 +45,10 @@
         >
       </div>
 
-      <button type="submit" class="login-btn" id="login-btn">Đăng nhập</button>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="login-btn" id="register-btn" style="background: #333;">Tạo tài khoản</button>
+        <button type="submit" class="login-btn" id="login-btn">Đăng nhập</button>
+      </div>
     </form>
   </div>
 </div>
@@ -87,6 +90,45 @@
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Đăng nhập';
+    }
+  });
+
+  document.getElementById('register-btn').addEventListener('click', async function() {
+    const btn    = document.getElementById('register-btn');
+    const errEl  = document.getElementById('login-error');
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      errEl.textContent = 'Vui lòng điền đủ Tên đăng nhập và Mật khẩu để tạo mới';
+      errEl.style.display = 'block';
+      errEl.style.background = '#fff1f2';
+      errEl.style.color = '#bb162b';
+      errEl.style.borderColor = '#ffe4e6';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Đang tạo...';
+    errEl.style.display = 'none';
+
+    const res = await API.register({ username, password });
+
+    btn.disabled = false;
+    btn.textContent = 'Tạo tài khoản';
+
+    if (res && res.ok) {
+      errEl.textContent = res.data.message || 'Thành công! Hãy bấm Đăng nhập.';
+      errEl.style.background = '#f0fdf4';
+      errEl.style.color = '#16a34a';
+      errEl.style.borderColor = '#22c55e';
+      errEl.style.display = 'block';
+    } else {
+      errEl.textContent = (res && res.data && res.data.message) ? res.data.message : 'Lỗi tạo tài khoản';
+      errEl.style.background = '#fff1f2';
+      errEl.style.color = '#bb162b';
+      errEl.style.borderColor = '#ffe4e6';
+      errEl.style.display = 'block';
     }
   });
 </script>

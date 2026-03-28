@@ -25,7 +25,7 @@ app.use('/api/cai-dat', require('./routes/caiDat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/anh-slide', require('./routes/anhSlide'));
 
-sequelize.sync({ alter: true }) // TODO: revert to { force: false } after first run
+sequelize.sync({ alter: true })
   .then(() => console.log('✅ Database đã sync xong!'))
   .catch(err => console.log('❌ Lỗi sync:', err));
 

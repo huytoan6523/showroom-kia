@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 function getToken() { return localStorage.getItem('admin_token'); }
 
@@ -9,11 +9,15 @@ function getHeaders(isFormData = false) {
 }
 
 async function apiFetch(path, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000); // 10s timeout
   try {
     const res = await fetch(API_BASE + path, {
       ...options,
+      signal: controller.signal,
       headers: { ...getHeaders(options.body instanceof FormData), ...options.headers }
     });
+    clearTimeout(timer);
     const data = await res.json();
     if (res.status === 401) {
       localStorage.removeItem('admin_token');
@@ -21,14 +25,17 @@ async function apiFetch(path, options = {}) {
       return null;
     }
     return { ok: res.ok, status: res.status, data };
-  } catch {
-    showToast('Lỗi kết nối server', 'error');
+  } catch (err) {
+    clearTimeout(timer);
+    const msg = err.name === 'AbortError' ? 'Máy chủ không phản hồi (timeout)' : 'Lỗi kết nối server';
+    showToast(msg, 'error');
     return null;
   }
 }
 
 const API = {
   login:            (body)          => apiFetch('/auth/login',                  { method: 'POST', body: JSON.stringify(body) }),
+  register:         (body)          => apiFetch('/auth/register',               { method: 'POST', body: JSON.stringify(body) }),
   doiMatKhau:       (body)          => apiFetch('/auth/doi-mat-khau',            { method: 'PUT',  body: JSON.stringify(body) }),
   getXe:            ()              => apiFetch('/xe'),
   getXeById:        (id)            => apiFetch('/xe/' + id),
