@@ -1,3 +1,4 @@
+process.env.UV_THREADPOOL_SIZE = 1;
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -42,7 +43,8 @@ const bcrypt = require('bcryptjs');
 sequelize.sync()
   .then(async () => {
     console.log('✅ Database đã sync xong!');
-    // Tự động kiểm tra admin trong "nền" để không chặn app khởi động
+    // [OPTIMIZE] Tạm tắt bớt công việc lúc khởi động để tiết kiệm Process cho Host
+    /*
     setImmediate(async () => {
       try {
         const adminCount = await Admin.count();
@@ -55,6 +57,7 @@ sequelize.sync()
         console.log('❌ Lỗi kiểm tra admin thầm lặng:', e.message);
       }
     });
+    */
   })
   .catch(err => console.log('❌ Lỗi sync:', err));
 
