@@ -40,26 +40,14 @@ app.use('/api/anh-slide', require('./routes/anhSlide'));
 const { Admin } = require('./models');
 const bcrypt = require('bcryptjs');
 
-sequelize.sync()
-  .then(async () => {
-    console.log('✅ Database đã sync xong!');
-    // [OPTIMIZE] Tạm tắt bớt công việc lúc khởi động để tiết kiệm Process cho Host
-    /*
-    setImmediate(async () => {
-      try {
-        const adminCount = await Admin.count();
-        if (adminCount === 0) {
-          const hashedPassword = await bcrypt.hash('admin123', 4);
-          await Admin.create({ username: 'admin', password: hashedPassword });
-          console.log('✅ Đã tự động tạo admin mặc định: admin/admin123');
-        }
-      } catch (e) {
-        console.log('❌ Lỗi kiểm tra admin thầm lặng:', e.message);
-      }
-    });
-    */
-  })
-  .catch(err => console.log('❌ Lỗi sync:', err));
+// [OPTIMIZE] Trì hoãn việc sync Database để Server khởi động nhanh nhất có thể
+setTimeout(() => {
+  sequelize.sync()
+    .then(async () => {
+      console.log('✅ Database đã được kết nối ở chế độ nền!');
+    })
+    .catch(err => console.log('❌ Lỗi kết nối DB sau khởi động:', err.message));
+}, 5000);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

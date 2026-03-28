@@ -9,17 +9,10 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-// Ưu tiên lấy thông tin từ file .env
-const dbName = process.env.DB_NAME || config.database;
-const dbUser = process.env.DB_USER || config.username;
-const dbPass = process.env.DB_PASSWORD || config.password;
-const dbHost = process.env.DB_HOST || config.host || '127.0.0.1';
-
-let sequelize = new Sequelize(dbName, dbUser, dbPass, {
-  host: dbHost,
-  dialect: 'mysql',
-  port: process.env.DB_PORT || 3306,
-  logging: false,
+// Ép dùng trực tiếp cấu hình từ file config/config.json cho ổn định trên cPanel
+let sequelize = new Sequelize(config.database, config.username, config.password, {
+  ...config,
+  host: config.host || '127.0.0.1',
   pool: { max: 1, min: 0, idle: 10000 }
 });
 
