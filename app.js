@@ -13,10 +13,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// [HEALTCH-CHECK] Cần thiết cho cPanel Installer
+// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch
 app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send('<h1>Showroom KIA - API is running</h1><p>Health check passed.</p>');
+  res.type('html'); // Trả về text/html chuẩn
+  res.send('Showroom KIA API is active');
 });
 
 // [DIAGNOSTIC] Kiểm tra nhanh
