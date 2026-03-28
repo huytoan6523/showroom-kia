@@ -15,7 +15,7 @@ const dbUser = process.env.DB_USER || config.username;
 const dbPass = process.env.DB_PASSWORD || config.password;
 const dbHost = process.env.DB_HOST || config.host || '127.0.0.1';
 
-sequelize = new Sequelize(dbName, dbUser, dbPass, {
+let sequelize = new Sequelize(dbName, dbUser, dbPass, {
   host: dbHost,
   dialect: 'mysql',
   port: process.env.DB_PORT || 3306,
