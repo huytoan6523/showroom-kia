@@ -5,15 +5,11 @@
 const API_BASE = '/api';
 
 async function apiFetch(path) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10000); // 10s timeout
   try {
-    const res = await fetch(API_BASE + path, { signal: controller.signal });
-    clearTimeout(timer);
+    const res = await fetch(API_BASE + path);
     const json = await res.json();
     return json.data ?? json;
-  } catch (err) {
-    clearTimeout(timer);
+  } catch {
     return null;
   }
 }

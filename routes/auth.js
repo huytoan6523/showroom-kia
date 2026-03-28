@@ -41,6 +41,39 @@ const authMiddleware = require('../middleware/auth');
  */
 router.post('/login', authController.login);
 
+router.post('/register', authController.register);
+
+// [DIAGNOSTIC] Kiểm tra kết nối DB
+router.get('/ping-db', async (req, res) => {
+  try {
+    const { Admin } = require('../models');
+    const count = await Admin.count();
+    res.json({ ok: true, admin_count: count, message: 'Kết nối DB tốt!' });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: 'Lỗi DB: ' + err.message });
+  }
+});
+
+// [SEED] Nạp dữ liệu mẫu
+router.get('/seed', async (req, res) => {
+  try {
+    const { Admin, Xe } = require('../models');
+    const bcrypt = require('bcryptjs');
+    const hashed = await bcrypt.hash('admin123', 4);
+    await Admin.findOrCreate({
+      where: { username: 'admin' },
+      defaults: { username: 'admin', password: hashed, hoTen: 'Admin' }
+    });
+    await Xe.findOrCreate({
+      where: { tenXe: 'KIA Seltos 2024' },
+      defaults: { tenXe: 'KIA Seltos 2024', loaiXe: 'SUV', giaBan: 600000000, tinhTrang: 'Sẵn xe' }
+    });
+    res.json({ ok: true, message: 'Đã nạp dữ liệu mẫu!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi seeding: ' + err.message });
+  }
+});
+
 /**
  * @swagger
  * /api/auth/doi-mat-khau:

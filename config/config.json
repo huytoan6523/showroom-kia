@@ -14,10 +14,15 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "toannhio_admin",
+    "password": "Ámbem2105",
+    "database": "toannhio_showroom_kia",
+    "host": "localhost",
+    "dialect": "mysql",
+    "logging": false,
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_ci"
+    }
   }
 }

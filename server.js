@@ -13,6 +13,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// [HEALTCH-CHECK] Cần thiết cho cPanel Installer
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send('<h1>Showroom KIA - API is running</h1><p>Health check passed.</p>');
+});
+
+// [DIAGNOSTIC] Kiểm tra nhanh
+app.get('/test', (req, res) => res.send('🚀 Server KIA đã nhận code mới nhất!'));
+app.get('/api/ping', (req, res) => res.json({ status: 'ok', msg: 'Pong!' }));
+
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -25,8 +35,26 @@ app.use('/api/cai-dat', require('./routes/caiDat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/anh-slide', require('./routes/anhSlide'));
 
-sequelize.sync({ alter: true }) // TODO: revert to { force: false } after first run
-  .then(() => console.log('✅ Database đã sync xong!'))
+const { Admin } = require('./models');
+const bcrypt = require('bcryptjs');
+
+sequelize.sync()
+  .then(async () => {
+    console.log('✅ Database đã sync xong!');
+    // Tự động kiểm tra admin trong "nền" để không chặn app khởi động
+    setImmediate(async () => {
+      try {
+        const adminCount = await Admin.count();
+        if (adminCount === 0) {
+          const hashedPassword = await bcrypt.hash('admin123', 4);
+          await Admin.create({ username: 'admin', password: hashedPassword });
+          console.log('✅ Đã tự động tạo admin mặc định: admin/admin123');
+        }
+      } catch (e) {
+        console.log('❌ Lỗi kiểm tra admin thầm lặng:', e.message);
+      }
+    });
+  })
   .catch(err => console.log('❌ Lỗi sync:', err));
 
 const PORT = process.env.PORT || 3000;

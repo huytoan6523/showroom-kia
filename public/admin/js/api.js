@@ -29,6 +29,7 @@ async function apiFetch(path, options = {}) {
 
 const API = {
   login:            (body)          => apiFetch('/auth/login',                  { method: 'POST', body: JSON.stringify(body) }),
+  register:         (body)          => apiFetch('/auth/register',               { method: 'POST', body: JSON.stringify(body) }),
   doiMatKhau:       (body)          => apiFetch('/auth/doi-mat-khau',            { method: 'PUT',  body: JSON.stringify(body) }),
   getXe:            ()              => apiFetch('/xe'),
   getXeById:        (id)            => apiFetch('/xe/' + id),
