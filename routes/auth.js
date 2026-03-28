@@ -54,6 +54,23 @@ router.get('/ping-db', async (req, res) => {
   }
 });
 
+// [DEBUG] Xem cấu hình thực tế (Không hiện mật khẩu)
+router.get('/debug-config', (req, res) => {
+  try {
+    const { Admin } = require('../models');
+    const config = Admin.sequelize.config;
+    res.json({
+      database: config.database,
+      username: config.username,
+      host: config.host,
+      port: config.port,
+      message: "Đây là cấu hình thực tế mà Server đang chạy!"
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // [SEED] Nạp dữ liệu mẫu
 router.get('/seed', async (req, res) => {
   try {
