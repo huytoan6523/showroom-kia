@@ -3,11 +3,20 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { sequelize } = require('./models');
+const db = require('./models');
+const sequelize = db.sequelize;
+const Admin = db.Admin;
+const bcrypt = require('bcryptjs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
 const app = express();
+
+// [HEALTH-CHECK] ĐẶC TRỊ LỖI CPANEL INSTALLER (ÉP CONTENT-TYPE)
+app.get('/', (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.end('Showroom KIA API is active');
+});
 
 // Middleware
 app.use(cors());
@@ -15,15 +24,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html'); // Ép đúng định dạng cPanel mong đợi
-  res.send('Showroom KIA API is active');
-});
-
 // [DIAGNOSTIC] Kiểm tra nhanh
 app.get('/test', (req, res) => {
-  res.send('🚀 SERVER ĐÃ NHẬN CODE MỚI NHẤT 16:09!');
+  res.send('🚀 SERVER ĐÃ NHẬN CODE MỚI NHẤT 17:25!');
 });
 app.get('/api/ping', (req, res) => res.json({ status: 'ok', msg: 'Pong!' }));
 
