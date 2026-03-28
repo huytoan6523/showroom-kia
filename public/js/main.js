@@ -2,14 +2,18 @@
    main.js — Shared utilities for KIA Showroom Customer Site
    ========================================================= */
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 async function apiFetch(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000); // 10s timeout
   try {
-    const res = await fetch(API_BASE + path);
+    const res = await fetch(API_BASE + path, { signal: controller.signal });
+    clearTimeout(timer);
     const json = await res.json();
     return json.data ?? json;
-  } catch {
+  } catch (err) {
+    clearTimeout(timer);
     return null;
   }
 }
@@ -59,7 +63,7 @@ function validatePhone(phone) {
 function imgSrc(path) {
   if (!path) return '/images/placeholder.jpg';
   if (path.startsWith('http')) return path;
-  return 'http://localhost:3000' + path;
+  return path;
 }
 
 function getParam(key) {

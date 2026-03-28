@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 function getToken() { return localStorage.getItem('admin_token'); }
 
@@ -119,7 +119,7 @@ function formatMoney(n) {
 function imgSrc(path) {
   if (!path) return null;
   if (path.startsWith('http')) return path;
-  return 'http://localhost:3000' + path;
+  return path;
 }
 
 function trangThaiBadge(tt) {
