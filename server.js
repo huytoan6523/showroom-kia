@@ -22,7 +22,9 @@ app.get('/', (req, res) => {
 });
 
 // [DIAGNOSTIC] Kiểm tra nhanh
-app.get('/test', (req, res) => res.send('🚀 Server KIA đã nhận code mới nhất!'));
+app.get('/test', (req, res) => {
+  res.send('🚀 SERVER ĐÃ NHẬN CODE MỚI NHẤT 16:09!');
+});
 app.get('/api/ping', (req, res) => res.json({ status: 'ok', msg: 'Pong!' }));
 
 // Swagger UI
