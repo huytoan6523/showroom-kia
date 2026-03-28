@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { sequelize } = require('./models');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
@@ -13,10 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch
+// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch & Khôi phục giao diện
 app.get('/', (req, res) => {
-  res.type('html'); // Trả về text/html chuẩn
-  res.send('Showroom KIA API is active');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // [DIAGNOSTIC] Kiểm tra nhanh
@@ -57,7 +57,7 @@ sequelize.sync()
   })
   .catch(err => console.log('❌ Lỗi sync:', err));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`🚀 Server KIA đã sẵn sàng và đang chạy!`);
 });
