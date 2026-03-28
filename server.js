@@ -14,9 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch & Khôi phục giao diện
+// [HEALTH-CHECK] Đặc trị lỗi cPanel "Content type" mismatch
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.setHeader('Content-Type', 'text/html'); // Ép đúng định dạng cPanel mong đợi
+  res.send('Showroom KIA API is active');
 });
 
 // [DIAGNOSTIC] Kiểm tra nhanh
