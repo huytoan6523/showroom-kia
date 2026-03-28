@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <meta name="description" content="Khám phá chi tiết, thông số kỹ thuật và giá xe KIA chính hãng.">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="page-top">
 
   <!-- ═══ NAVBAR ═══ -->
@@ -15,10 +17,10 @@
       <div class="nav-inner">
         <a href="index.html" class="nav-logo">KIA<span>.</span></a>
         <div id="nav-menu">
-          <a href="index.html"    class="nav-link">Trang chủ</a>
-          <a href="xe.html"       class="nav-link">Dòng xe</a>
-          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
-          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
+          <a href="index.html" class="nav-link">Trang chủ</a>
+          <a href="xe.html" class="nav-link">Sản phẩm</a>
+          <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+          <a href="lien-he.html" class="nav-link">Liên hệ</a>
           <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
@@ -49,21 +51,21 @@
 
       const id = getParam('id');
       if (!id) {
-        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại dòng xe</a>${emptyHTML('Không tìm thấy xe.')}`;
+        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại</a>${emptyHTML('Không tìm thấy xe.')}`;
         return;
       }
 
       const xe = await apiFetch('/xe/' + id);
       if (!xe) {
-        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại dòng xe</a>${emptyHTML('Không thể tải thông tin xe.')}`;
+        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại</a>${emptyHTML('Không thể tải thông tin xe.')}`;
         return;
       }
 
       document.title = xe.ten_xe + ' — Showroom KIA';
       const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute('content', xe.mo_ta ? xe.mo_ta.substring(0, 160) : 'Chi tiết xe ' + xe.ten_xe + '. Giá tốt, hỗ trợ trả góp.');
+      if (metaDesc) metaDesc.setAttribute('content', xe.mo_ta ? xe.mo_ta.substring(0, 160) : 'Chi tiết xe ' + xe.ten_xe);
 
-      /* images */
+      /* ── Images ── */
       const images = [];
       if (xe.anh_dai_dien) images.push(xe.anh_dai_dien);
       (xe.AnhXes || []).sort((a, b) => a.thu_tu - b.thu_tu).forEach(a => {
@@ -82,63 +84,92 @@
            </div>`
         : '';
 
-      /* versions */
-      const versions  = xe.PhienBans || [];
-      const priceText = formatPriceRange(xe.PhienBans);
+      /* ── Versions ── */
+      const versions = xe.PhienBans || [];
+      const priceText = formatPriceRange(versions);
 
-      const versionsHTML = `<div style="margin-top:20px">
-        <h4 style="margin-bottom:8px">Phiên bản &amp; giá</h4>
-        ${versions.length
-          ? `<table class="spec-table">
-               ${versions.map(v => `<tr><td style="text-transform:none">${v.ten_phien_ban}</td><td style="text-transform:none">${formatMoney(v.gia)}</td></tr>`).join('')}
-             </table>`
-          : `<p style="color:var(--muted);font-size:.9rem">Vui lòng liên hệ showroom để biết giá.</p>`}
-      </div>`;
+      const versionsHTML = versions.length
+        ? `<div class="versions-section">
+            <h4>Phiên bản &amp; giá</h4>
+            <table class="version-table">
+              ${versions.map(v => `
+                <tr>
+                  <td>${v.ten_phien_ban}</td>
+                  <td>${formatMoney(v.gia)}</td>
+                </tr>`).join('')}
+            </table>
+           </div>`
+        : '';
 
-      /* specs */
+      /* ── Specs ── */
       const specs = [
-        ['Loại xe',        xe.loai_xe],
-        ['Năm sản xuất',   xe.nam_san_xuat],
-        ['Động cơ',        xe.dong_co],
-        ['Hộp số',         xe.hop_so],
-        ['Nhiên liệu',     xe.nhien_lieu],
-        ['Số chỗ ngồi',    xe.so_cho_ngoi ? xe.so_cho_ngoi + ' chỗ' : null],
-        ['Mức tiêu thụ',   xe.muc_tieu_thu],
-        ['Kích thước',     xe.kich_thuoc],
+        ['Loại xe', xe.loai_xe],
+        ['Năm sản xuất', xe.nam_san_xuat],
+        ['Động cơ', xe.dong_co],
+        ['Hộp số', xe.hop_so],
+        ['Nhiên liệu', xe.nhien_lieu],
+        ['Số chỗ ngồi', xe.so_cho_ngoi ? xe.so_cho_ngoi + ' chỗ' : null],
+        ['Mức tiêu thụ', xe.muc_tieu_thu],
+        ['Kích thước', xe.kich_thuoc],
       ].filter(([, v]) => v != null && v !== '');
 
       const specsHTML = specs.length
-        ? `<table class="spec-table">
-            ${specs.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
-           </table>`
+        ? `<section class="specs-section reveal">
+            <h3>Thông số kỹ thuật</h3>
+            <table class="spec-table">
+              ${specs.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+            </table>
+           </section>`
         : '';
 
+      /* ── Description ── */
+      const descHTML = xe.mo_ta
+        ? `<section class="desc-section reveal">
+            <h3>Mô tả</h3>
+            <p>${xe.mo_ta}</p>
+           </section>`
+        : '';
+
+      /* ── Render ── */
       el.innerHTML = `
-        <a href="xe.html" class="back-link">← Quay lại dòng xe</a>
+        <a href="xe.html" class="back-link">← Quay lại</a>
+
+        <!-- TOP: image + info -->
         <div class="car-detail-layout reveal">
-          <!-- images -->
+
+          <!-- Left: images -->
           <div>
-            <img id="car-main-img" src="${mainImgSrc}" alt="${xe.ten_xe}" class="car-main-img"
-              onerror="this.style.display='none'">
+            <img id="car-main-img" src="${mainImgSrc}" alt="${xe.ten_xe}"
+              class="car-main-img" onerror="this.style.display='none'">
             ${thumbsHTML}
           </div>
-          <!-- info -->
+
+          <!-- Right: title + price + versions + CTA -->
           <div class="car-info">
-            ${xe.loai_xe ? `<span class="car-info-tag">${xe.loai_xe}</span>` : ''}
             <h1>${xe.ten_xe}</h1>
             <div class="car-price-block">
               <div class="car-price-label">Giá bán lẻ đề xuất</div>
               <div class="car-price">${priceText}</div>
             </div>
-            ${xe.mo_ta ? `<p class="car-desc">${xe.mo_ta}</p>` : ''}
-            ${specsHTML}
+
             ${versionsHTML}
+
             <div class="car-actions">
-              <a href="dat-lich.html?xe=${encodeURIComponent(xe.ten_xe)}" class="btn btn-primary">Đặt lịch lái thử</a>
+              <a href="dat-lich.html?xe=${encodeURIComponent(xe.ten_xe)}"
+                class="btn btn-primary">Đặt lịch lái thử</a>
               <a href="lien-he.html" class="btn btn-outline-dark">Liên hệ tư vấn</a>
             </div>
           </div>
-        </div>`;
+        </div>
+
+        <!-- BOTTOM: specs + description -->
+        ${specsHTML || descHTML
+          ? `<div class="car-below">
+              ${specsHTML}
+              ${descHTML}
+             </div>`
+          : ''}
+      `;
 
       initScrollReveal();
     })();
@@ -151,4 +182,5 @@
     }
   </script>
 </body>
+
 </html>

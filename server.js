@@ -13,22 +13,18 @@ const swaggerSpec = require('./config/swagger');
 const app = express();
 
 // [HEALTH-CHECK] ĐẶC TRỊ LỖI CPANEL INSTALLER (ÉP CONTENT-TYPE)
+/*
 app.get('/', (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html' });
   res.end('Showroom KIA API is active');
 });
+*/
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// [DIAGNOSTIC] Kiểm tra nhanh
-app.get('/test', (req, res) => {
-  res.send('🚀 SERVER ĐÃ NHẬN CODE MỚI NHẤT 17:25!');
-});
-app.get('/api/ping', (req, res) => res.json({ status: 'ok', msg: 'Pong!' }));
 
 // Swagger UI - Tạm tắt để tiết kiệm Process
 /*
@@ -62,9 +58,9 @@ setTimeout(() => {
       }
     })
     .catch(err => console.log('❌ Lỗi kết nối DB sau khởi động:', err.message));
-}, 10000); // Đợi 10 giây cho app ổn định rồi mới nạp DB
+}, 10000);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`🚀 Server KIA đã sẵn sàng và đang chạy!`);
+  console.log(`🚀 Server KIA đã sẵn sàng và đang chạy!`);
 });
