@@ -27,8 +27,10 @@ app.get('/test', (req, res) => {
 });
 app.get('/api/ping', (req, res) => res.json({ status: 'ok', msg: 'Pong!' }));
 
-// Swagger UI
+// Swagger UI - Tạm tắt để tiết kiệm Process
+/*
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+*/
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -39,17 +41,25 @@ app.use('/api/cai-dat', require('./routes/caiDat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/anh-slide', require('./routes/anhSlide'));
 
-const { Admin } = require('./models');
-const bcrypt = require('bcryptjs');
-
-// [OPTIMIZE] Trì hoãn việc sync Database để Server khởi động nhanh nhất có thể
+// [OPTIMIZE] Trì hoãn việc sync Database và tạo Admin
 setTimeout(() => {
   sequelize.sync()
     .then(async () => {
       console.log('✅ Database đã được kết nối ở chế độ nền!');
+      // Tự động nạp Admin sau khi DB đã sẵn sàng
+      try {
+        const adminCount = await Admin.count();
+        if (adminCount === 0) {
+          const hashedPassword = await bcrypt.hash('admin123', 4);
+          await Admin.create({ username: 'admin', password: hashedPassword, hoTen: 'Admin' });
+          console.log('✅ Đã tự động tạo admin mặc định: admin/admin123');
+        }
+      } catch (e) {
+        console.log('❌ Lỗi nạp admin thầm lặng:', e.message);
+      }
     })
     .catch(err => console.log('❌ Lỗi kết nối DB sau khởi động:', err.message));
-}, 5000);
+}, 10000); // Đợi 10 giây cho app ổn định rồi mới nạp DB
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
