@@ -9,18 +9,19 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], {
-    ...config,
-    pool: { max: 1, min: 0, idle: 10000 }
-  });
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, {
-    ...config,
-    pool: { max: 1, min: 0, idle: 10000 }
-  });
-}
+// Ưu tiên lấy thông tin từ file .env
+const dbName = process.env.DB_NAME || config.database;
+const dbUser = process.env.DB_USER || config.username;
+const dbPass = process.env.DB_PASSWORD || config.password;
+const dbHost = process.env.DB_HOST || config.host || '127.0.0.1';
+
+sequelize = new Sequelize(dbName, dbUser, dbPass, {
+  host: dbHost,
+  dialect: 'mysql',
+  port: process.env.DB_PORT || 3306,
+  logging: false,
+  pool: { max: 1, min: 0, idle: 10000 }
+});
 
 fs
   .readdirSync(__dirname)
