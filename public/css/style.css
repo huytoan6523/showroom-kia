@@ -163,18 +163,26 @@ p {
   inset-inline: 0;
   top: 0;
   z-index: 999;
-  height: var(--nav-h);
+  height: auto;
+  padding-top: 4px; /* Mặc định cho di động */
   background: var(--white);
   border-bottom: 1px solid var(--gray-line);
-  transition: box-shadow var(--transition);
+  transition: all var(--transition);
+}
+
+@media (min-width: 768px) {
+  #navbar {
+    padding-top: 6px; /* Cách mép cho máy tính trông sang hơn */
+  }
 }
 
 #navbar.scrolled {
-  box-shadow: 0 2px 16px rgba(0, 0, 0, .10);
+  padding-top: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
 }
 
 .nav-inner {
-  height: 100%;
+  height: var(--nav-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -328,12 +336,20 @@ p {
 
 /* ── Hero ─────────────────────────────────────────────────── */
 .hero {
-  min-height: 100vh;
+  min-height: 65vh;
   background: var(--black);
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
+  padding: 80px 0; /* Padding đảm bảo chữ không dính biên */
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding: 120px 0 80px; /* Thêm padding top để bù cho Navbar lửng */
+  }
 }
 
 .hero::after {
@@ -373,7 +389,7 @@ p {
 .hero p {
   color: rgba(255, 255, 255, .65);
   font-size: 1.05rem;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   max-width: 460px;
   text-transform: none;
 }
@@ -531,6 +547,7 @@ p {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   margin-bottom: 16px;
   flex: 1;

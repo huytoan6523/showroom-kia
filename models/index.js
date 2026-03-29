@@ -9,11 +9,17 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-// Ép dùng trực tiếp cấu hình từ file config/config.json cho ổn định trên cPanel
-let sequelize = new Sequelize(config.database, config.username, config.password, {
+// Ép dùng cấu hình tùy chỉnh cho Shared Hosting (giới hạn 30 tiến trình)
+const sequelize = new Sequelize(config.database, config.username, config.password, {
   ...config,
   host: config.host || '127.0.0.1',
-  pool: { max: 1, min: 0, idle: 10000 }
+  pool: { 
+    max: 1, 
+    min: 0, 
+    idle: 1000, // Đóng kết nối sau 1 giây nhàn rỗi để giải phóng suất
+    acquire: 30000,
+    evict: 1000 
+  }
 });
 
 fs
