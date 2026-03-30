@@ -89,11 +89,11 @@ async function loadFooter() {
         <div class="footer-col">
           <h4>Khám phá</h4>
           <ul>
-            <li><a href="index.html">Trang chủ</a></li>
-            <li><a href="xe.html">Dòng xe</a></li>
-            <li><a href="tin-tuc.html">Tin tức</a></li>
-            <li><a href="dat-lich.html">Đặt lịch lái thử</a></li>
-            <li><a href="lien-he.html">Liên hệ</a></li>
+            <li><a href="/">Trang chủ</a></li>
+            <li><a href="/san-pham">Sản phẩm</a></li>
+            <li><a href="/tin-tuc">Tin tức</a></li>
+            <li><a href="/dat-lich">Đặt lịch lái thử</a></li>
+            <li><a href="/lien-he">Liên hệ</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -143,9 +143,14 @@ function initNav() {
   }
 
   /* mark active link */
-  const page = location.pathname.split('/').pop() || 'index.html';
+  const path = location.pathname;
   document.querySelectorAll('.nav-link').forEach(a => {
-    if (a.getAttribute('href') === page) a.classList.add('active');
+    const href = a.getAttribute('href');
+    if (href === path || (path === '/' && href === '/index.html')) {
+        a.classList.add('active');
+    } else if (path.startsWith(href) && href !== '/') {
+        a.classList.add('active');
+    }
   });
 }
 

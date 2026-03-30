@@ -135,7 +135,7 @@
 
     var rows = items.map(function(d, idx) {
       var num = (currentPage - 1) * PAGE_SIZE + idx + 1;
-      return '<tr>' +
+      return '<tr ondblclick="openDetail(' + d.id + ')" style="cursor: pointer;" title="Nhấn đúp chuột để xem chi tiết">' +
         '<td style="color:var(--muted);font-size:12px">' + num + '</td>' +
         '<td>' + (d.ho_ten || '—') + '</td>' +
         '<td>' + (d.so_dien_thoai || '—') + '</td>' +

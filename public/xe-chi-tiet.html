@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chi tiết xe — Showroom KIA</title>
   <meta name="description" content="Khám phá chi tiết, thông số kỹ thuật và giá xe KIA chính hãng.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body class="page-top">
@@ -15,13 +15,13 @@
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html" class="nav-link">Trang chủ</a>
-          <a href="xe.html" class="nav-link">Sản phẩm</a>
-          <a href="tin-tuc.html" class="nav-link">Tin tức</a>
-          <a href="lien-he.html" class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -40,7 +40,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer id="footer"></footer>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -49,15 +49,17 @@
       const el = document.getElementById('car-detail');
       el.innerHTML = spinnerHTML();
 
-      const id = getParam('id');
-      if (!id) {
-        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại</a>${emptyHTML('Không tìm thấy xe.')}`;
+      const slug = window.location.pathname.split('/').pop();
+      if (!slug) {
+        el.innerHTML = `<a href="/san-pham" class="back-link">← Quay lại</a>${emptyHTML('Không tìm thấy xe.')}`;
         return;
       }
 
-      const xe = await apiFetch('/xe/' + id);
-      if (!xe) {
-        el.innerHTML = `<a href="xe.html" class="back-link">← Quay lại</a>${emptyHTML('Không thể tải thông tin xe.')}`;
+      const xeRes = await apiFetch('/xe/slug/' + slug);
+      const xe = (xeRes && xeRes.data) ? xeRes.data : xeRes;
+
+      if (!xe || !xe.id) {
+        el.innerHTML = `<a href="/san-pham" class="back-link">← Quay lại</a>${emptyHTML('Không thể tải thông tin xe.')}`;
         return;
       }
 
@@ -91,48 +93,33 @@
       const versionsHTML = versions.length
         ? `<div class="versions-section">
             <h4>Phiên bản &amp; giá</h4>
-            <table class="version-table">
+            <div class="version-list">
               ${versions.map(v => `
-                <tr>
-                  <td>${v.ten_phien_ban}</td>
-                  <td>${formatMoney(v.gia)}</td>
-                </tr>`).join('')}
-            </table>
+                <div class="version-item">
+                  <span class="version-name">${v.ten_phien_ban}</span>
+                  <span class="version-price">${formatMoney(v.gia)}</span>
+                </div>`).join('')}
+            </div>
            </div>`
         : '';
 
-      /* ── Specs ── */
-      const specs = [
-        ['Loại xe', xe.loai_xe],
-        ['Năm sản xuất', xe.nam_san_xuat],
-        ['Động cơ', xe.dong_co],
-        ['Hộp số', xe.hop_so],
-        ['Nhiên liệu', xe.nhien_lieu],
-        ['Số chỗ ngồi', xe.so_cho_ngoi ? xe.so_cho_ngoi + ' chỗ' : null],
-        ['Mức tiêu thụ', xe.muc_tieu_thu],
-        ['Kích thước', xe.kich_thuoc],
-      ].filter(([, v]) => v != null && v !== '');
-
-      const specsHTML = specs.length
-        ? `<section class="specs-section reveal">
-            <h3>Thông số kỹ thuật</h3>
-            <table class="spec-table">
-              ${specs.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
-            </table>
-           </section>`
-        : '';
-
-      /* ── Description ── */
+      /* ── Description (Supports HTML) ── */
       const descHTML = xe.mo_ta
         ? `<section class="desc-section reveal">
-            <h3>Mô tả</h3>
-            <p>${xe.mo_ta}</p>
+            <h3 style="margin-bottom:24px">Chi tiết sản phẩm</h3>
+            <div class="rich-text-content">${xe.mo_ta}</div>
            </section>`
         : '';
 
       /* ── Render ── */
       el.innerHTML = `
-        <a href="xe.html" class="back-link">← Quay lại</a>
+        <div class="breadcrumb">
+          <a href="/">Trang chủ</a>
+          <span>/</span>
+          <a href="/san-pham">Sản phẩm</a>
+          <span>/</span>
+          <span>${xe.ten_xe}</span>
+        </div>
 
         <!-- TOP: image + info -->
         <div class="car-detail-layout reveal">
@@ -147,28 +134,31 @@
           <!-- Right: title + price + versions + CTA -->
           <div class="car-info">
             <h1>${xe.ten_xe}</h1>
+            
+            ${xe.mo_ta_ngan ? `<div class="car-short-desc">${xe.mo_ta_ngan}</div>` : ''}
+
             <div class="car-price-block">
               <div class="car-price-label">Giá bán lẻ đề xuất</div>
               <div class="car-price">${priceText}</div>
+              ${xe.giam_gia_max ? `
+                <div class="car-promo">
+                  <span class="promo-tag">Ưu đãi</span>
+                  Ưu đãi lên đến <strong>${formatMoney(xe.giam_gia_max)}</strong>
+                </div>` : ''}
             </div>
 
             ${versionsHTML}
 
             <div class="car-actions">
-              <a href="dat-lich.html?xe=${encodeURIComponent(xe.ten_xe)}"
+              <a href="/dat-lich?xe=${encodeURIComponent(xe.ten_xe)}"
                 class="btn btn-primary">Đặt lịch lái thử</a>
-              <a href="lien-he.html" class="btn btn-outline-dark">Liên hệ tư vấn</a>
+              <a href="/lien-he" class="btn btn-outline-dark">Liên hệ tư vấn</a>
             </div>
           </div>
         </div>
 
-        <!-- BOTTOM: specs + description -->
-        ${specsHTML || descHTML
-          ? `<div class="car-below">
-              ${specsHTML}
-              ${descHTML}
-             </div>`
-          : ''}
+        <!-- BOTTOM: description -->
+        ${descHTML ? `<div class="car-below">${descHTML}</div>` : ''}
       `;
 
       initScrollReveal();

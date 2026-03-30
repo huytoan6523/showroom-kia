@@ -7,7 +7,7 @@
   <title>KIA Showroom — Trang chủ</title>
   <meta name="description"
     content="Showroom KIA chính hãng. Khám phá các dòng xe KIA mới nhất, đặt lịch lái thử miễn phí.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
@@ -16,13 +16,13 @@
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA</a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html" class="nav-link">Trang chủ</a>
-          <a href="xe.html" class="nav-link">Sản phẩm</a>
-          <a href="tin-tuc.html" class="nav-link">Tin tức</a>
-          <a href="lien-he.html" class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -35,12 +35,11 @@
   <section class="hero">
     <div class="container">
       <div class="hero-content">
-        <span class="hero-eyebrow">Showroom KIA Chính Hãng</span>
-        <h1>Khám phá<br>dòng xe KIA</h1>
+        <h1 class="hero-eyebrow">Showroom KIA Chính Hãng</h1>
         <p>Trải nghiệm công nghệ tiên tiến, thiết kế hiện đại và sự an toàn vượt trội trong từng chuyến đi.</p>
         <div class="hero-actions">
-          <a href="xe.html" class="btn btn-primary">Xem tất cả xe</a>
-          <a href="dat-lich.html" class="btn btn-outline">Đặt lịch lái thử</a>
+          <a href="/san-pham" class="btn btn-primary">Xem tất cả xe</a>
+          <a href="/dat-lich" class="btn btn-outline">Đặt lịch lái thử</a>
         </div>
       </div>
     </div>
@@ -66,7 +65,7 @@
       </div>
       <div class="card-grid" id="featured-news"></div>
       <div style="text-align:center;margin-top:40px" class="reveal">
-        <a href="tin-tuc.html" class="btn btn-outline-dark">Xem tất cả tin tức</a>
+        <a href="/tin-tuc" class="btn btn-outline-dark">Xem tất cả tin tức</a>
       </div>
     </div>
   </section>
@@ -104,7 +103,7 @@
     <div class="container">
       <h2>Đặt lịch lái thử ngay hôm nay</h2>
       <p>Trải nghiệm cảm giác lái xe KIA miễn phí tại showroom của chúng tôi.</p>
-      <a href="dat-lich.html" class="btn btn-primary">Đặt lịch ngay</a>
+      <a href="/dat-lich" class="btn btn-primary">Đặt lịch ngay</a>
     </div>
   </section>
 
@@ -132,7 +131,7 @@
     </div>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -348,12 +347,16 @@
         el.innerHTML = emptyHTML('Không có dữ liệu xe.');
         return;
       }
-      const featured = cars.filter(c => c.noi_bat);
-      const list = featured.length ? featured : cars;
+      const list = cars.filter(c => c.noi_bat);
+      if (!list.length) {
+        document.querySelector('.section:has(#featured-cars)').style.display = 'none';
+        return;
+      }
       el.innerHTML = list.map((xe, i) => {
         const priceText = formatPriceRange(xe.PhienBans);
+        const detailUrl = `/san-pham/${xe.slug || xe.id}`;
         return `
-          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='xe-chi-tiet.html?id=${xe.id}'">
+          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='${detailUrl}'">
             <div class="card-img-wrap">
               ${imgTag(xe.anh_dai_dien, xe.ten_xe, '')}
             </div>
@@ -377,8 +380,10 @@
         return;
       }
       const list = news.slice(0, 3);
-      el.innerHTML = list.map((t, i) => `
-        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='tin-chi-tiet.html?id=${t.id}'">
+      el.innerHTML = list.map((t, i) => {
+        const detailUrl = `/tin-tuc/${t.slug || t.id}`;
+        return `
+        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='${detailUrl}'">
           <div class="card-img-wrap">
             ${imgTag(t.anh_dai_dien, t.tieu_de, '')}
           </div>
@@ -388,7 +393,8 @@
             <div class="card-desc">${t.tom_tat || ''}</div>
             <span class="card-link">Đọc thêm <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
       initScrollReveal();
     })();
 

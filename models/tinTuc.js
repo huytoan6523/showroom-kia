@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    slug: {
+      type: DataTypes.STRING(255),
+      unique: true,
+    },
     tom_tat: {
       type: DataTypes.TEXT,
     },

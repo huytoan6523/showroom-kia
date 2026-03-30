@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dòng xe KIA — Showroom KIA</title>
-  <meta name="description" content="Khám phá toàn bộ dòng xe KIA tại showroom chính hãng. SUV, Sedan, MPV và nhiều hơn nữa.">
-  <link rel="stylesheet" href="css/style.css">
+  <title>Sản phẩm KIA — Showroom KIA</title>
+  <meta name="description"
+    content="Khám phá toàn bộ dòng xe KIA tại showroom chính hãng. SUV, Sedan, MPV và nhiều hơn nữa.">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="page-top">
 
   <!-- ═══ NAVBAR ═══ -->
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html"    class="nav-link">Trang chủ</a>
-          <a href="xe.html"       class="nav-link">Dòng xe</a>
-          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
-          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -32,11 +35,11 @@
   <div class="page-hero">
     <div class="container">
       <div class="breadcrumb">
-        <a href="index.html">Trang chủ</a>
+        <a href="/">Trang chủ</a>
         <span>/</span>
-        <span>Dòng xe</span>
+        <span>Sản phẩm</span>
       </div>
-      <h1>Dòng xe KIA</h1>
+      <h1>Sản phẩm</h1>
       <p>Khám phá toàn bộ danh mục xe KIA tại showroom của chúng tôi.</p>
     </div>
   </div>
@@ -52,7 +55,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer id="footer"></footer>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -67,8 +70,9 @@
       }
       grid.innerHTML = list.map((xe, i) => {
         const priceText = formatPriceRange(xe.PhienBans);
+        const detailUrl = `/san-pham/${xe.slug || xe.id}`;
         return `
-          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='xe-chi-tiet.html?id=${xe.id}'">
+          <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='${detailUrl}'">
             <div class="card-img-wrap">
               ${imgTag(xe.anh_dai_dien, xe.ten_xe, '')}
             </div>
@@ -118,4 +122,5 @@
     })();
   </script>
 </body>
+
 </html>

@@ -34,11 +34,21 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/xe', require('./routes/xe'));
+app.use('/api/san-pham', require('./routes/xe'));
 app.use('/api/tin-tuc', require('./routes/tinTuc'));
 app.use('/api/dat-lich', require('./routes/datLich'));
 app.use('/api/cai-dat', require('./routes/caiDat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/anh-slide', require('./routes/anhSlide'));
+
+// Frontend Routes (Clean URLs)
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
+app.get('/san-pham', (req, res) => res.sendFile(path.join(__dirname, 'public/xe.html')));
+app.get('/san-pham/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public/xe-chi-tiet.html')));
+app.get('/tin-tuc', (req, res) => res.sendFile(path.join(__dirname, 'public/tin-tuc.html')));
+app.get('/tin-tuc/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public/tin-chi-tiet.html')));
+app.get('/dat-lich', (req, res) => res.sendFile(path.join(__dirname, 'public/dat-lich.html')));
+app.get('/lien-he', (req, res) => res.sendFile(path.join(__dirname, 'public/lien-he.html')));
 
 // [OPTIMIZE] Trì hoãn việc sync Database và tạo Admin
 setTimeout(() => {

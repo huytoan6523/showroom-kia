@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tin tức — Showroom KIA</title>
   <meta name="description" content="Tin tức mới nhất về xe KIA, sự kiện và ưu đãi từ showroom.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="page-top">
 
   <!-- ═══ NAVBAR ═══ -->
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html"    class="nav-link">Trang chủ</a>
-          <a href="xe.html"       class="nav-link">Dòng xe</a>
-          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
-          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -32,7 +34,7 @@
   <div class="page-hero">
     <div class="container">
       <div class="breadcrumb">
-        <a href="index.html">Trang chủ</a>
+        <a href="/">Trang chủ</a>
         <span>/</span>
         <span>Tin tức</span>
       </div>
@@ -51,7 +53,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer id="footer"></footer>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -67,8 +69,10 @@
       }
 
       const sorted = [...news].sort((a, b) => (b.noi_bat ? 1 : 0) - (a.noi_bat ? 1 : 0));
-      grid.innerHTML = sorted.map((t, i) => `
-        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='tin-chi-tiet.html?id=${t.id}'">
+      grid.innerHTML = sorted.map((t, i) => {
+        const detailUrl = `/tin-tuc/${t.slug || t.id}`;
+        return `
+        <div class="card reveal reveal-d${(i % 3) + 1}" onclick="location.href='${detailUrl}'">
           <div class="card-img-wrap">
             ${imgTag(t.anh_dai_dien, t.tieu_de, '')}
           </div>
@@ -79,10 +83,12 @@
             <div class="card-desc">${t.tom_tat || ''}</div>
             <span class="card-link">Đọc thêm <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
 
       initScrollReveal();
     })();
   </script>
 </body>
+
 </html>

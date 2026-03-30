@@ -165,7 +165,7 @@ function renderPaginationBtns(containerId, current, total, onChangePage) {
 function initLayout(activePage) {
   const navItems = [
     { href: 'dashboard.html', icon: '📊', label: 'Tổng quan',  id: 'dashboard' },
-    { href: 'xe.html',        icon: '🚗', label: 'Quản lý xe', id: 'xe'        },
+    { href: 'xe.html',        icon: '🚗', label: 'Sản phẩm',   id: 'xe'        },
     { href: 'tin-tuc.html',   icon: '📰', label: 'Tin tức',    id: 'tin-tuc'   },
     { href: 'dat-lich.html',  icon: '📅', label: 'Đặt lịch',   id: 'dat-lich'  },
     { href: 'anh-slide.html', icon: '🖼️', label: 'Ảnh Slide',  id: 'anh-slide' },

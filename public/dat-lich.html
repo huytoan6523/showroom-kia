@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đặt lịch lái thử — Showroom KIA</title>
   <meta name="description" content="Đặt lịch lái thử xe KIA miễn phí tại showroom chính hãng.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
     .booking-layout {
       display: grid;
@@ -13,11 +14,13 @@
       gap: 48px;
       align-items: start;
     }
+
     .sidebar-card {
       border: 1px solid var(--gray-line);
       border-radius: var(--radius);
       padding: 28px;
     }
+
     .sidebar-card h4 {
       font-size: .9rem;
       font-weight: 700;
@@ -25,6 +28,7 @@
       color: var(--black);
       text-transform: none;
     }
+
     .sidebar-card p,
     .sidebar-card li {
       font-size: .85rem;
@@ -32,8 +36,15 @@
       margin-bottom: 8px;
       text-transform: none;
     }
-    .sidebar-card ul { padding-left: 16px; }
-    .sidebar-card ul li { list-style: disc; }
+
+    .sidebar-card ul {
+      padding-left: 16px;
+    }
+
+    .sidebar-card ul li {
+      list-style: disc;
+    }
+
     .sidebar-info-item {
       display: flex;
       gap: 10px;
@@ -41,25 +52,32 @@
       border-bottom: 1px solid var(--gray-line);
       font-size: .88rem;
     }
-    .sidebar-info-item:last-child { border-bottom: none; }
+
+    .sidebar-info-item:last-child {
+      border-bottom: none;
+    }
+
     @media (max-width: 900px) {
-      .booking-layout { grid-template-columns: 1fr; }
+      .booking-layout {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body class="page-top">
 
   <!-- ═══ NAVBAR ═══ -->
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html"    class="nav-link">Trang chủ</a>
-          <a href="xe.html"       class="nav-link">Dòng xe</a>
-          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
-          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -72,7 +90,7 @@
   <div class="page-hero">
     <div class="container">
       <div class="breadcrumb">
-        <a href="index.html">Trang chủ</a>
+        <a href="/">Trang chủ</a>
         <span>/</span>
         <span>Đặt lịch lái thử</span>
       </div>
@@ -89,7 +107,8 @@
         <!-- form card -->
         <div class="form-card reveal">
           <h2 style="margin-bottom:8px">Thông tin đặt lịch</h2>
-          <p style="margin-bottom:28px">Điền đầy đủ thông tin bên dưới, chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.</p>
+          <p style="margin-bottom:28px">Điền đầy đủ thông tin bên dưới, chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.
+          </p>
 
           <div id="form-notice" class="form-notice"></div>
 
@@ -103,8 +122,7 @@
               <div class="form-group">
                 <label class="form-label" for="so_dien_thoai">Số điện thoại <span class="req">*</span></label>
                 <input type="tel" id="so_dien_thoai" class="form-control" placeholder="0909 123 456" autocomplete="tel"
-                  oninput="clearPhoneError()"
-                  onblur="setPhoneError(validatePhone(this.value))">
+                  oninput="clearPhoneError()" onblur="setPhoneError(validatePhone(this.value))">
                 <div class="field-error" id="error-so_dien_thoai"></div>
               </div>
             </div>
@@ -112,7 +130,8 @@
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="email">Email</label>
-                <input type="email" id="email" class="form-control" placeholder="email@example.com" autocomplete="email">
+                <input type="email" id="email" class="form-control" placeholder="email@example.com"
+                  autocomplete="email">
                 <div class="field-err" id="err-email">Email không hợp lệ.</div>
               </div>
               <div class="form-group">
@@ -170,7 +189,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer id="footer"></footer>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -189,9 +208,9 @@
       const data = await apiFetch('/cai-dat');
       if (!data) return;
       const items = [
-        data.dia_chi       && `<div class="sidebar-info-item"><span>📍</span><span>${data.dia_chi}</span></div>`,
+        data.dia_chi && `<div class="sidebar-info-item"><span>📍</span><span>${data.dia_chi}</span></div>`,
         data.so_dien_thoai && `<div class="sidebar-info-item"><span>📞</span><a href="tel:${data.so_dien_thoai}">${data.so_dien_thoai}</a></div>`,
-        data.gio_lam_viec  && `<div class="sidebar-info-item"><span>🕐</span><span>${data.gio_lam_viec}</span></div>`,
+        data.gio_lam_viec && `<div class="sidebar-info-item"><span>🕐</span><span>${data.gio_lam_viec}</span></div>`,
       ].filter(Boolean);
       if (items.length) {
         document.getElementById('sidebar-info').innerHTML = items.join('');
@@ -240,28 +259,28 @@
     }
 
     /* submit */
-    document.getElementById('booking-form').addEventListener('submit', async function(e) {
+    document.getElementById('booking-form').addEventListener('submit', async function (e) {
       e.preventDefault();
       if (!validate()) return;
 
       const notice = document.getElementById('form-notice');
-      const btn    = document.getElementById('submit-btn');
+      const btn = document.getElementById('submit-btn');
       notice.style.display = 'none';
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = 'Đang gửi...';
 
       const payload = {
-        ho_ten:        document.getElementById('ho_ten').value.trim(),
+        ho_ten: document.getElementById('ho_ten').value.trim(),
         so_dien_thoai: document.getElementById('so_dien_thoai').value.trim(),
-        email:         document.getElementById('email').value.trim() || undefined,
-        xe_quan_tam:   document.getElementById('xe_quan_tam').value.trim() || undefined,
-        ngay_hen:      document.getElementById('ngay_hen').value,
-        ghi_chu:       document.getElementById('ghi_chu').value.trim() || undefined,
+        email: document.getElementById('email').value.trim() || undefined,
+        xe_quan_tam: document.getElementById('xe_quan_tam').value.trim() || undefined,
+        ngay_hen: document.getElementById('ngay_hen').value,
+        ghi_chu: document.getElementById('ghi_chu').value.trim() || undefined,
       };
 
       const result = await apiPost('/dat-lich', payload);
 
-      btn.disabled    = false;
+      btn.disabled = false;
       btn.textContent = 'Xác nhận đặt lịch';
 
       if (result && (result.data || result.message)) {
@@ -279,4 +298,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -1,4 +1,5 @@
 const { Xe, PhienBan, MauXe, AnhXe } = require('../models');
+const slugify = require('../utils/slugify');
 
 const includeAll = [
   { model: PhienBan },
@@ -34,9 +35,26 @@ exports.getById = async (req, res) => {
   }
 };
 
+exports.getBySlug = async (req, res) => {
+  try {
+    const data = await Xe.findOne({
+      where: { slug: req.params.slug },
+      include: includeAll
+    });
+    if (!data) return res.status(404).json({ message: 'Không tìm thấy xe' });
+    res.json({ message: 'Lấy thông tin xe thành công', data });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
 exports.create = async (req, res) => {
   try {
     const { phien_ban, mau_xe, ...xeData } = req.body;
+
+    if (xeData.ten_xe) {
+      xeData.slug = slugify(xeData.ten_xe);
+    }
 
     const xe = await Xe.create(xeData);
 
@@ -63,6 +81,10 @@ exports.update = async (req, res) => {
     if (!xe) return res.status(404).json({ message: 'Không tìm thấy xe' });
 
     const { phien_ban, mau_xe, ...xeData } = req.body;
+
+    if (xeData.ten_xe) {
+      xeData.slug = slugify(xeData.ten_xe);
+    }
 
     await xe.update(xeData);
 

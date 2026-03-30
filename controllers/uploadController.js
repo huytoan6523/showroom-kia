@@ -4,7 +4,7 @@ const multer = require('multer');
 const { Xe, AnhXe, MauXe, TinTuc } = require('../models');
 
 // Ensure upload directories exist on startup
-['xe', 'mau', 'tin-tuc'].forEach((folder) => {
+['xe', 'mau', 'tin-tuc', 'editor'].forEach((folder) => {
   fs.mkdirSync(path.join(__dirname, '..', 'public', 'images', folder), { recursive: true });
 });
 
@@ -34,6 +34,7 @@ const uploadAnhXeMulti = multer({ storage: makeStorage('xe'), fileFilter, limits
 const uploadAnhXeSingle = multer({ storage: makeStorage('xe'), fileFilter, limits }).single('image');
 const uploadAnhMau = multer({ storage: makeStorage('mau'), fileFilter, limits }).single('image');
 const uploadAnhTinTuc = multer({ storage: makeStorage('tin-tuc'), fileFilter, limits }).single('image');
+const uploadEditor = multer({ storage: makeStorage('editor'), fileFilter, limits }).single('file');
 
 exports.anhXe = (req, res) => {
   uploadAnhXeMulti(req, res, async (err) => {
@@ -129,4 +130,14 @@ exports.deleteAnhXe = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
+};
+
+exports.editor = (req, res) => {
+  uploadEditor(req, res, (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+    if (!req.file)
+      return res.status(400).json({ message: 'Không có file nào được upload' });
+
+    res.json({ location: `/images/editor/${req.file.filename}` });
+  });
 };

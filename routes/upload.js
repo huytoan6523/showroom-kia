@@ -270,5 +270,6 @@ router.post('/tin-tuc/:tin_tuc_id', auth, uploadController.anhTinTuc);
  *         description: Không tìm thấy ảnh
  */
 router.delete('/anh-xe/:anh_id', auth, uploadController.deleteAnhXe);
+router.post('/editor', auth, uploadController.editor);
 
 module.exports = router;

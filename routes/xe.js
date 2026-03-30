@@ -143,6 +143,7 @@ router.get('/noi-bat', xeController.getNoiBat);
  *         description: Không tìm thấy xe
  */
 router.get('/:id', xeController.getById);
+router.get('/slug/:slug', xeController.getBySlug);
 
 // Admin routes
 

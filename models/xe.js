@@ -4,32 +4,21 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    slug: {
+      type: DataTypes.STRING(255),
+      unique: true,
+    },
     loai_xe: {
       type: DataTypes.STRING(100),
     },
-    nam_san_xuat: {
-      type: DataTypes.INTEGER,
+    mo_ta_ngan: {
+      type: DataTypes.TEXT,
     },
     mo_ta: {
       type: DataTypes.TEXT,
     },
-    dong_co: {
-      type: DataTypes.STRING(100),
-    },
-    hop_so: {
-      type: DataTypes.STRING(100),
-    },
-    nhien_lieu: {
-      type: DataTypes.STRING(50),
-    },
-    so_cho_ngoi: {
-      type: DataTypes.TINYINT,
-    },
-    muc_tieu_thu: {
-      type: DataTypes.STRING(50),
-    },
-    kich_thuoc: {
-      type: DataTypes.STRING(150),
+    giam_gia_max: {
+      type: DataTypes.BIGINT,
     },
     anh_dai_dien: {
       type: DataTypes.TEXT,
@@ -37,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
     noi_bat: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    thu_tu: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   }, {
     tableName: 'xe',

@@ -103,6 +103,7 @@ router.get('/', tinTucController.getAll);
  *         description: Không tìm thấy tin tức
  */
 router.get('/:id', tinTucController.getById);
+router.get('/slug/:slug', tinTucController.getBySlug);
 
 /**
  * @swagger

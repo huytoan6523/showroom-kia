@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Liên hệ — Showroom KIA</title>
   <meta name="description" content="Liên hệ với showroom KIA chính hãng. Địa chỉ, điện thoại, email và giờ làm việc.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="page-top">
 
   <!-- ═══ NAVBAR ═══ -->
   <nav id="navbar">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo">KIA<span>.</span></a>
+        <a href="/" class="nav-logo">KIA</a>
         <div id="nav-menu">
-          <a href="index.html"    class="nav-link">Trang chủ</a>
-          <a href="xe.html"       class="nav-link">Dòng xe</a>
-          <a href="tin-tuc.html"  class="nav-link">Tin tức</a>
-          <a href="lien-he.html"  class="nav-link">Liên hệ</a>
-          <a href="dat-lich.html" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="/san-pham" class="nav-link">Sản phẩm</a>
+          <a href="/tin-tuc" class="nav-link">Tin tức</a>
+          <a href="/lien-he" class="nav-link">Liên hệ</a>
+          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -32,7 +34,7 @@
   <div class="page-hero">
     <div class="container">
       <div class="breadcrumb">
-        <a href="index.html">Trang chủ</a>
+        <a href="/">Trang chủ</a>
         <span>/</span>
         <span>Liên hệ</span>
       </div>
@@ -59,13 +61,8 @@
           <div class="map-wrap">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3711.234!2d106.3167929!3d20.4389873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135e535692a7667:0x5240a5f8491d89ee!2zS2lhIFRow6FpIELDrG5o!5e0!3m2!1svi!2svn!4v1234567890"
-              width="100%"
-              height="400"
-              style="border:0; border-radius:8px;"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Bản đồ vị trí showroom">
+              width="100%" height="400" style="border:0; border-radius:8px;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade" title="Bản đồ vị trí showroom">
             </iframe>
           </div>
         </div>
@@ -86,8 +83,8 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="c_so_dien_thoai">Số điện thoại <span class="req">*</span></label>
-                <input type="tel" id="c_so_dien_thoai" class="form-control" placeholder="0909 123 456" autocomplete="tel"
-                  oninput="showFieldError('so_dien_thoai', '')"
+                <input type="tel" id="c_so_dien_thoai" class="form-control" placeholder="0909 123 456"
+                  autocomplete="tel" oninput="showFieldError('so_dien_thoai', '')"
                   onblur="const e=validatePhone(this.value); showFieldError('so_dien_thoai', e||'')">
                 <div class="field-error" id="error-so_dien_thoai"></div>
               </div>
@@ -97,7 +94,8 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="c_ghi_chu">Nội dung</label>
-                <textarea id="c_ghi_chu" class="form-control" rows="3" placeholder="Câu hỏi hoặc yêu cầu của bạn..."></textarea>
+                <textarea id="c_ghi_chu" class="form-control" rows="3"
+                  placeholder="Câu hỏi hoặc yêu cầu của bạn..."></textarea>
               </div>
               <button type="submit" class="btn btn-primary" id="c_submit-btn" style="width:100%">
                 Gửi liên hệ
@@ -113,7 +111,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer id="footer"></footer>
 
-  <script src="js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     initNav();
     loadFooter();
@@ -135,16 +133,16 @@
 
       /* heading */
       if (data.ten_cong_ty) document.getElementById('showroom-name').textContent = data.ten_cong_ty;
-      if (data.gioi_thieu)  document.getElementById('showroom-desc').textContent = data.gioi_thieu;
+      if (data.gioi_thieu) document.getElementById('showroom-desc').textContent = data.gioi_thieu;
 
       /* info blocks */
       const fields = [
-        { label: 'Địa chỉ',        icon: '📍', value: data.dia_chi,       link: null },
-        { label: 'Điện thoại',      icon: '📞', value: data.so_dien_thoai, link: data.so_dien_thoai ? 'tel:' + data.so_dien_thoai : null },
-        { label: 'Email',           icon: '✉️',  value: data.email,         link: data.email ? 'mailto:' + data.email : null },
-        { label: 'Giờ làm việc',    icon: '🕐', value: data.gio_lam_viec,  link: null },
-        { label: 'Facebook',        icon: '🌐', value: data.facebook ? 'Trang Facebook' : null, link: data.facebook },
-        { label: 'Zalo',            icon: '💬', value: data.zalo,          link: data.zalo ? 'https://zalo.me/' + data.zalo : null },
+        { label: 'Địa chỉ', icon: '📍', value: data.dia_chi, link: null },
+        { label: 'Điện thoại', icon: '📞', value: data.so_dien_thoai, link: data.so_dien_thoai ? 'tel:' + data.so_dien_thoai : null },
+        { label: 'Email', icon: '✉️', value: data.email, link: data.email ? 'mailto:' + data.email : null },
+        { label: 'Giờ làm việc', icon: '🕐', value: data.gio_lam_viec, link: null },
+        { label: 'Facebook', icon: '🌐', value: data.facebook ? 'Trang Facebook' : null, link: data.facebook },
+        { label: 'Zalo', icon: '💬', value: data.zalo, link: data.zalo ? 'https://zalo.me/' + data.zalo : null },
       ].filter(f => f.value);
 
       document.getElementById('contact-info-blocks').innerHTML = fields.map(f => `
@@ -153,8 +151,8 @@
           <div class="info-block-value">
             ${f.icon}&nbsp;
             ${f.link
-              ? `<a href="${f.link}"${f.link.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${f.value}</a>`
-              : f.value}
+          ? `<a href="${f.link}"${f.link.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${f.value}</a>`
+          : f.value}
           </div>
         </div>`).join('');
 
@@ -179,7 +177,7 @@
       document.getElementById(errId).classList.add('show');
     }
 
-    document.getElementById('contact-form').addEventListener('submit', async function(e) {
+    document.getElementById('contact-form').addEventListener('submit', async function (e) {
       e.preventDefault();
       clearCErr();
       let ok = true;
@@ -194,34 +192,35 @@
       if (!ok) return;
 
       const notice = document.getElementById('contact-form-notice');
-      const btn    = document.getElementById('c_submit-btn');
+      const btn = document.getElementById('c_submit-btn');
       notice.style.display = 'none';
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = 'Đang gửi...';
 
       const payload = {
-        ho_ten:        hoTen,
+        ho_ten: hoTen,
         so_dien_thoai: sdt,
-        xe_quan_tam:   document.getElementById('c_xe_quan_tam').value.trim() || undefined,
-        ghi_chu:       document.getElementById('c_ghi_chu').value.trim()    || undefined,
+        xe_quan_tam: document.getElementById('c_xe_quan_tam').value.trim() || undefined,
+        ghi_chu: document.getElementById('c_ghi_chu').value.trim() || undefined,
       };
 
       const result = await apiPost('/dat-lich', payload);
 
-      btn.disabled    = false;
+      btn.disabled = false;
       btn.textContent = 'Gửi liên hệ';
 
       if (result && (result.data || result.message)) {
-        notice.className     = 'form-notice success';
-        notice.textContent   = '✅ Gửi thành công! Chúng tôi sẽ liên hệ bạn sớm nhất.';
+        notice.className = 'form-notice success';
+        notice.textContent = '✅ Gửi thành công! Chúng tôi sẽ liên hệ bạn sớm nhất.';
         notice.style.display = 'block';
         this.reset();
       } else {
-        notice.className     = 'form-notice error';
-        notice.textContent   = '❌ Gửi thất bại. Vui lòng thử lại hoặc gọi điện trực tiếp.';
+        notice.className = 'form-notice error';
+        notice.textContent = '❌ Gửi thất bại. Vui lòng thử lại hoặc gọi điện trực tiếp.';
         notice.style.display = 'block';
       }
     });
   </script>
 </body>
+
 </html>
