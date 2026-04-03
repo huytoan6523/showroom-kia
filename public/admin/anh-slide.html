@@ -99,6 +99,23 @@
       padding: 48px; color: var(--muted); font-size: 15px;
     }
     .empty-slides .empty-icon { font-size: 40px; margin-bottom: 8px; }
+    /* ── Tabs ── */
+    .tabs .btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .tabs .btn.active {
+      background: var(--accent) !important;
+      color: white !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 2px 8px rgba(187, 22, 43, 0.25);
+    }
+    .tabs .btn:hover:not(.active) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
