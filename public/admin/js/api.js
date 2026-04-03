@@ -17,7 +17,10 @@ async function apiFetch(path, options = {}) {
     const data = await res.json();
     if (res.status === 401) {
       localStorage.removeItem('admin_token');
-      location.href = '/admin/index.html';
+      // Thêm tham số để trang login hiển thị thông báo
+      if (!location.pathname.endsWith('index.html')) {
+        location.href = '/admin/index.html?expired=true';
+      }
       return null;
     }
     return { ok: res.ok, status: res.status, data };

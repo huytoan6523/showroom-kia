@@ -59,6 +59,21 @@
     location.href = 'dashboard.html';
   }
 
+  // Kiểm tra lỗi hết hạn phiên
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('expired') === 'true') {
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '⚠️ Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.';
+    errEl.style.display = 'block';
+    errEl.style.background = '#fffbeb';
+    errEl.style.color = '#92400e';
+    errEl.style.border = '1px solid #fef3c7';
+    errEl.style.padding = '10px';
+    errEl.style.borderRadius = '6px';
+    errEl.style.marginBottom = '16px';
+    errEl.style.fontSize = '14px';
+  }
+
   // Logic Đăng ký (Thêm mới)
   document.getElementById('register-btn').addEventListener('click', async function() {
     const username = document.getElementById('username').value.trim();
