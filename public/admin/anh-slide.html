@@ -124,7 +124,7 @@
   <div class="page-header">
     <div>
       <div class="page-title">Quản lý Slide & Ảnh</div>
-      <div class="page-subtitle">Cấu hình Slider HERO và thư viện ảnh Khách hàng</div>
+      <div class="page-subtitle" id="page-subtitle">Cấu hình Slider HERO cho trang chủ</div>
     </div>
   </div>
 
@@ -166,7 +166,7 @@
   <!-- Slide grid -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">Danh sách ảnh slide</div>
+      <div class="card-title" id="list-title">Danh sách Slide HERO</div>
       <span id="slide-count" style="color:var(--muted);font-size:13px;"></span>
     </div>
     <div style="padding: 24px;">
@@ -189,8 +189,16 @@
 
   function switchTab(tab) {
     currentTab = tab;
+    
+    // Cập nhật UI nút
     document.getElementById('tab-hero').classList.toggle('active', tab === 'hero');
     document.getElementById('tab-khach_hang').classList.toggle('active', tab === 'khach_hang');
+    
+    // Cập nhật tiêu đề động
+    const label = tab === 'hero' ? 'Slide HERO' : 'Ảnh Khách hàng';
+    document.getElementById('list-title').textContent = 'Danh sách ' + label;
+    document.getElementById('page-subtitle').textContent = 'Quản lý ' + label + ' hiển thị trên website';
+    
     loadSlides();
   }
 
