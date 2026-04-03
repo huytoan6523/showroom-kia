@@ -34,7 +34,15 @@ const upload = multer({
 // GET /api/anh-slide — public, no auth
 router.get('/', async (req, res) => {
   try {
-    const data = await AnhSlide.findAll({ order: [['thu_tu', 'ASC'], ['created_at', 'ASC']] });
+    const { vi_tri, all } = req.query; // all=true để lấy cả ảnh đang bị ẩn (dùng cho admin)
+    const where = {};
+    if (vi_tri) where.vi_tri = vi_tri;
+    if (all !== 'true') where.hien_thi = true;
+
+    const data = await AnhSlide.findAll({ 
+      where,
+      order: [['thu_tu', 'ASC'], ['created_at', 'ASC']] 
+    });
     res.json({ message: 'Lấy danh sách ảnh slide thành công', data });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
@@ -47,15 +55,37 @@ router.post('/upload', auth, upload.array('images', 20), async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'Vui lòng chọn ít nhất một ảnh' });
     }
+    const { vi_tri, thu_tu } = req.body;
+    
     const records = await Promise.all(
       req.files.map((file, idx) =>
         AnhSlide.create({
           url_anh: '/images/slide/' + file.filename,
-          thu_tu: Number(req.body.thu_tu) || idx,
+          vi_tri: vi_tri || 'khach_hang',
+          thu_tu: Number(thu_tu) || idx,
+          hien_thi: true
         })
       )
     );
     res.status(201).json({ message: 'Tải ảnh lên thành công', data: records });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+});
+
+// PUT /api/anh-slide/:id — auth required, update metadata
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const slide = await AnhSlide.findByPk(req.params.id);
+    if (!slide) return res.status(404).json({ message: 'Không tìm thấy ảnh slide' });
+
+    const { thu_tu, hien_thi, vi_tri } = req.body;
+    if (thu_tu !== undefined) slide.thu_tu = Number(thu_tu);
+    if (hien_thi !== undefined) slide.hien_thi = hien_thi;
+    if (vi_tri !== undefined) slide.vi_tri = vi_tri;
+
+    await slide.save();
+    res.json({ message: 'Cập nhật ảnh slide thành công', data: slide });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }

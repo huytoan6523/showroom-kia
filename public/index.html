@@ -31,18 +31,22 @@
     </div>
   </nav>
 
-  <!-- ═══ HERO ═══ -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <h1 class="hero-eyebrow">Showroom KIA Chính Hãng</h1>
-        <p>Trải nghiệm công nghệ tiên tiến, thiết kế hiện đại và sự an toàn vượt trội trong từng chuyến đi.</p>
-        <div class="hero-actions">
-          <a href="/san-pham" class="btn btn-primary">Xem tất cả xe</a>
-          <a href="/dat-lich" class="btn btn-outline">Đặt lịch lái thử</a>
-        </div>
+  <!-- ═══ HERO SLIDER ═══ -->
+  <section class="hero-slider" id="hero-slider-section">
+    <div class="hero-track" id="hero-track">
+      <!-- Mặc định khi chưa có ảnh hoặc đang tải -->
+      <div class="hero-slide">
+        <section class="hero" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; background: #000;">
+          <div class="container" style="text-align: center;">
+            <div class="hero-content" style="margin: 0 auto; color: white;">
+              <h1 class="hero-eyebrow">Showroom KIA Chính Hãng</h1>
+              <p>Trải nghiệm công nghệ tiên tiến và dịch vụ chuyên nghiệp.</p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
+    <div class="hero-dots" id="hero-dots"></div>
   </section>
 
   <!-- ═══ FEATURED CARS ═══ -->
@@ -216,7 +220,7 @@
     let itemWidth = 0;
 
     async function loadSlides() {
-      const data = await apiFetch('/anh-slide');
+      const data = await apiFetch('/anh-slide?vi_tri=khach_hang');
       slides = data || [];
 
       if (!slides.length) {
@@ -311,6 +315,61 @@
     });
 
     loadSlides();
+
+    // ═══ HERO SLIDER LOGIC ═══
+    let heroSlides = [];
+    let heroIndex = 0;
+    let heroTimer = null;
+
+    async function loadHeroSlides() {
+      const res = await apiFetch('/anh-slide?vi_tri=hero');
+      heroSlides = res || [];
+      
+      const track = document.getElementById('hero-track');
+      const dotsEl = document.getElementById('hero-dots');
+      if (!track || !heroSlides.length) return;
+
+      // Render slides (theo yêu cầu: chỉ ảnh, tự trượt)
+      track.innerHTML = heroSlides.map(s => `
+        <div class="hero-slide">
+          <img src="${imgSrc(s.url_anh)}" alt="KIA Hero" loading="eager">
+        </div>
+      `).join('');
+
+      // Render dots
+      dotsEl.innerHTML = heroSlides.map((_, i) => `<div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="goToHero(${i})"></div>`).join('');
+
+      startHeroAutoSlide();
+    }
+
+    function updateHeroPosition() {
+      const track = document.getElementById('hero-track');
+      const dots = document.querySelectorAll('.hero-dot');
+      if (!track) return;
+      
+      track.style.transform = `translateX(-${heroIndex * 100}%)`;
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === heroIndex));
+    }
+
+    function nextHero() {
+      if (!heroSlides.length) return;
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      updateHeroPosition();
+    }
+
+    function goToHero(index) {
+      clearInterval(heroTimer);
+      heroIndex = index;
+      updateHeroPosition();
+      startHeroAutoSlide();
+    }
+
+    function startHeroAutoSlide() {
+      if (heroSlides.length <= 1) return;
+      heroTimer = setInterval(nextHero, 4000);
+    }
+
+    loadHeroSlides();
 
     // ═══ TƯ VẤN NHANH ═══
     function submitTuVanNhanh() {

@@ -106,9 +106,15 @@
 <main class="main-content">
   <div class="page-header">
     <div>
-      <div class="page-title">Ảnh Slide Khách Hàng</div>
-      <div class="page-subtitle">Quản lý ảnh hiển thị trên trang chủ</div>
+      <div class="page-title">Quản lý Slide & Ảnh</div>
+      <div class="page-subtitle">Cấu hình Slider HERO và thư viện ảnh Khách hàng</div>
     </div>
+  </div>
+
+  <!-- Tabs phân loại -->
+  <div class="tabs" style="margin-bottom: 24px; display: flex; gap: 10px;">
+    <button class="btn btn-secondary active" id="tab-hero" onclick="switchTab('hero')">Slider HERO</button>
+    <button class="btn btn-secondary" id="tab-khach_hang" onclick="switchTab('khach_hang')">Khách hàng KIA</button>
   </div>
 
   <!-- Upload section -->
@@ -162,10 +168,18 @@
   initLayout('anh-slide');
 
   let selectedFiles = [];
+  let currentTab = 'hero';
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-hero').classList.toggle('active', tab === 'hero');
+    document.getElementById('tab-khach_hang').classList.toggle('active', tab === 'khach_hang');
+    loadSlides();
+  }
 
   // ── Load slides ──────────────────────────────────────────────
   async function loadSlides() {
-    const res = await API.getAnhSlide();
+    const res = await API.getAnhSlide({ vi_tri: currentTab, all: true });
     const grid = document.getElementById('slide-grid');
     const countEl = document.getElementById('slide-count');
 
@@ -175,23 +189,45 @@
     }
 
     const slides = res.data.data || res.data || [];
-    countEl.textContent = `${slides.length} ảnh`;
+    countEl.textContent = `${slides.length} ảnh (${currentTab === 'hero' ? 'Trang đầu' : 'Khách hàng'})`;
 
     if (slides.length === 0) {
-      grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">🖼️</div><p>Chưa có ảnh nào. Hãy tải ảnh lên!</p></div>`;
+      grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">🖼️</div><p>Chưa có ảnh nào trong mục này. Hãy tải ảnh lên!</p></div>`;
       return;
     }
 
     grid.innerHTML = slides.map(s => `
       <div class="slide-card" id="slide-${s.id}">
-        <img src="${imgSrc(s.url_anh)}" alt="Slide ${s.id}"
-          onerror="this.src='https://via.placeholder.com/200x150?text=Lỗi+ảnh'">
+        <div style="position:relative">
+          <img src="${imgSrc(s.url_anh)}" alt="Slide ${s.id}"
+            style="opacity: ${s.hien_thi ? 1 : 0.4}"
+            onerror="this.src='https://via.placeholder.com/200x150?text=Lỗi+ảnh'">
+          ${!s.hien_thi ? '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.6);color:white;padding:4px 8px;border-radius:4px;font-size:11px">ĐANG ẨN</div>' : ''}
+        </div>
         <div class="slide-card-info">
-          <span class="slide-card-order">Thứ tự: <strong>${s.thu_tu}</strong></span>
-          <button class="slide-del-btn" onclick="deleteSlide(${s.id})">🗑️ Xóa</button>
+          <div style="display:flex; flex-direction:column; gap:4px">
+            <div class="slide-card-order">
+              Thứ tự: <input type="number" value="${s.thu_tu}" style="width:50px; padding:2px 4px; border:1px solid var(--border); border-radius:4px; background:var(--surface2); color:var(--text)" onchange="updateSlide(${s.id}, {thu_tu: this.value})">
+            </div>
+            <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color: var(--text); padding-top: 4px;">
+              <input type="checkbox" ${s.hien_thi ? 'checked' : ''} onchange="updateSlide(${s.id}, {hien_thi: this.checked})"> <span style="text-transform: none;">Hiển thị</span>
+            </label>
+          </div>
+          <button class="slide-del-btn" onclick="deleteSlide(${s.id})" title="Xóa">🗑️</button>
         </div>
       </div>
     `).join('');
+  }
+
+  // ── Update slide ─────────────────────────────────────────────
+  async function updateSlide(id, body) {
+    const res = await API.updateAnhSlide(id, body);
+    if (res && res.ok) {
+        showToast('Cập nhật thành công');
+        if (body.hien_thi !== undefined) loadSlides();
+    } else {
+        showToast('Cập nhật thất bại', 'error');
+    }
   }
 
   // ── Delete slide ─────────────────────────────────────────────
@@ -200,14 +236,7 @@
       const res = await API.deleteAnhSlide(id);
       if (res && res.ok) {
         showToast('Đã xóa ảnh thành công');
-        document.getElementById('slide-' + id)?.remove();
-        // Update count
-        const grid = document.getElementById('slide-grid');
-        const remaining = grid.querySelectorAll('.slide-card').length;
-        document.getElementById('slide-count').textContent = `${remaining} ảnh`;
-        if (remaining === 0) {
-          grid.innerHTML = `<div class="empty-slides"><div class="empty-icon">🖼️</div><p>Chưa có ảnh nào. Hãy tải ảnh lên!</p></div>`;
-        }
+        loadSlides();
       } else {
         showToast('Xóa ảnh thất bại', 'error');
       }
@@ -217,10 +246,9 @@
   // ── File selection ────────────────────────────────────────────
   document.getElementById('file-input').addEventListener('change', function () {
     handleFiles(Array.from(this.files));
-    this.value = ''; // reset so same file can be selected again
+    this.value = '';
   });
 
-  // Drag & drop
   const uploadArea = document.getElementById('upload-area');
   uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
@@ -253,7 +281,7 @@
     }
 
     actions.style.display = 'flex';
-    countEl.textContent = `${selectedFiles.length} ảnh được chọn`;
+    countEl.textContent = `${selectedFiles.length} ảnh được chọn cho mục ${currentTab === 'hero' ? 'Slide HERO' : 'Khách hàng'}`;
     grid.innerHTML = selectedFiles.map((f, idx) => {
       const url = URL.createObjectURL(f);
       return `
@@ -278,26 +306,27 @@
   async function doUpload() {
     if (selectedFiles.length === 0) return;
     const btn = document.getElementById('btn-upload');
-    btn.textContent = '⏳ Đang tải...';
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Đang tải...';
     btn.disabled = true;
 
     const fd = new FormData();
     selectedFiles.forEach(f => fd.append('images', f));
+    fd.append('vi_tri', currentTab);
 
     const res = await API.uploadAnhSlide(fd);
-    btn.textContent = '⬆️ Tải lên';
+    btn.innerHTML = originalText;
     btn.disabled = false;
 
     if (res && res.ok) {
-      showToast(`Tải lên thành công ${selectedFiles.length} ảnh`);
+      showToast(`Tải lên thành công vào mục ${currentTab === 'hero' ? 'Slide HERO' : 'Khách hàng'}`);
       clearPreviews();
       loadSlides();
     } else {
-      showToast('Tải lên thất bại, vui lòng thử lại', 'error');
+      showToast('Tải lên thất bại', 'error');
     }
   }
 
-  // ── Init ──────────────────────────────────────────────────────
   loadSlides();
 </script>
 </body>

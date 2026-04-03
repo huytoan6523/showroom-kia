@@ -53,8 +53,12 @@ const API = {
   updatePhienBan:   (xe_id, id, body) => apiFetch(`/xe/${xe_id}/phien-ban/${id}`, { method: 'PUT',    body: JSON.stringify(body) }),
   deletePhienBan:   (xe_id, id)     => apiFetch(`/xe/${xe_id}/phien-ban/${id}`,   { method: 'DELETE' }),
   uploadAnhSlide:   (fd)            => apiFetch('/anh-slide/upload',               { method: 'POST', body: fd }),
+  updateAnhSlide:   (id, body)      => apiFetch('/anh-slide/' + id,                { method: 'PUT',  body: JSON.stringify(body) }),
   deleteAnhSlide:   (id)            => apiFetch('/anh-slide/' + id,                { method: 'DELETE' }),
-  getAnhSlide:      ()              => apiFetch('/anh-slide'),
+  getAnhSlide:      (params)        => {
+    const q = params ? '?' + new URLSearchParams(params).toString() : '';
+    return apiFetch('/anh-slide' + q);
+  },
 };
 
 function showToast(msg, type = 'success') {

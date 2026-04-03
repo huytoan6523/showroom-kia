@@ -8,6 +8,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    vi_tri: {
+      type: DataTypes.STRING,
+      defaultValue: 'khach_hang', // 'hero' hoặc 'khach_hang'
+    },
+    hien_thi: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   }, {
     tableName: 'anh_slide',
     timestamps: true,

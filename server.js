@@ -52,7 +52,7 @@ app.get('/lien-he', (req, res) => res.sendFile(path.join(__dirname, 'public/lien
 
 // [OPTIMIZE] Trì hoãn việc sync Database và tạo Admin
 setTimeout(() => {
-  sequelize.sync()
+  sequelize.sync({ alter: true })
     .then(async () => {
       console.log('✅ Database đã được kết nối ở chế độ nền!');
       // Tự động nạp Admin sau khi DB đã sẵn sàng
