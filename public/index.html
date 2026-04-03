@@ -46,7 +46,6 @@
         </section>
       </div>
     </div>
-    <div class="hero-dots" id="hero-dots"></div>
   </section>
 
   <!-- ═══ FEATURED CARS ═══ -->
@@ -326,7 +325,6 @@
       heroSlides = res || [];
       
       const track = document.getElementById('hero-track');
-      const dotsEl = document.getElementById('hero-dots');
       if (!track || !heroSlides.length) return;
 
       // Render slides (theo yêu cầu: chỉ ảnh, tự trượt)
@@ -336,19 +334,14 @@
         </div>
       `).join('');
 
-      // Render dots
-      dotsEl.innerHTML = heroSlides.map((_, i) => `<div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="goToHero(${i})"></div>`).join('');
-
       startHeroAutoSlide();
     }
 
     function updateHeroPosition() {
       const track = document.getElementById('hero-track');
-      const dots = document.querySelectorAll('.hero-dot');
       if (!track) return;
       
       track.style.transform = `translateX(-${heroIndex * 100}%)`;
-      dots.forEach((dot, i) => dot.classList.toggle('active', i === heroIndex));
     }
 
     function nextHero() {
