@@ -50,25 +50,23 @@ app.get('/tin-tuc/:slug', (req, res) => res.sendFile(path.join(__dirname, 'publi
 app.get('/dat-lich', (req, res) => res.sendFile(path.join(__dirname, 'public/dat-lich.html')));
 app.get('/lien-he', (req, res) => res.sendFile(path.join(__dirname, 'public/lien-he.html')));
 
-// [OPTIMIZE] Trì hoãn việc sync Database và tạo Admin
-setTimeout(() => {
-  sequelize.sync({ alter: true })
-    .then(async () => {
-      console.log('✅ Database đã được kết nối ở chế độ nền!');
-      // Tự động nạp Admin sau khi DB đã sẵn sàng
-      try {
-        const adminCount = await Admin.count();
-        if (adminCount === 0) {
-          const hashedPassword = await bcrypt.hash('admin123', 4);
-          await Admin.create({ username: 'admin', password: hashedPassword, hoTen: 'Admin' });
-          console.log('✅ Đã tự động tạo admin mặc định: admin/admin123');
-        }
-      } catch (e) {
-        console.log('❌ Lỗi nạp admin thầm lặng:', e.message);
+// [OPTIMIZE] Thực hiện sync Database ngay khi khởi động
+sequelize.sync({ alter: true })
+  .then(async () => {
+    console.log('✅ Database đã được đồng bộ!');
+    // Tự động nạp Admin
+    try {
+      const adminCount = await db.Admin.count();
+      if (adminCount === 0) {
+        const hashedPassword = await bcrypt.hash('admin123', 4);
+        await db.Admin.create({ username: 'admin', password: hashedPassword, hoTen: 'Admin' });
+        console.log('✅ Đã tự động tạo admin mặc định: admin/admin123');
       }
-    })
-    .catch(err => console.log('❌ Lỗi kết nối DB sau khởi động:', err.message));
-}, 10000);
+    } catch (e) {
+      console.log('❌ Lỗi nạp admin:', e.message);
+    }
+  })
+  .catch(err => console.log('❌ Lỗi kết nối DB:', err.message));
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
