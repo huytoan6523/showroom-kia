@@ -76,18 +76,29 @@ router.post('/upload', auth, upload.array('images', 20), async (req, res) => {
 // PUT /api/anh-slide/:id — auth required, update metadata
 router.put('/:id', auth, async (req, res) => {
   try {
-    const slide = await AnhSlide.findByPk(req.params.id);
+    const { id } = req.params;
+    const slide = await AnhSlide.findByPk(id);
     if (!slide) return res.status(404).json({ message: 'Không tìm thấy ảnh slide' });
 
     const { thu_tu, hien_thi, vi_tri } = req.body;
-    if (thu_tu !== undefined) slide.thu_tu = Number(thu_tu);
-    if (hien_thi !== undefined) slide.hien_thi = hien_thi;
-    if (vi_tri !== undefined) slide.vi_tri = vi_tri;
+    
+    // Tạo đối tượng cập nhật
+    const updateData = {};
+    if (thu_tu !== undefined) updateData.thu_tu = Number(thu_tu);
+    if (vi_tri !== undefined) updateData.vi_tri = vi_tri;
+    
+    // Xử lý hien_thi một cách tuyệt đối (ép về 0 hoặc 1)
+    if (hien_thi !== undefined) {
+        updateData.hien_thi = (hien_thi === true || hien_thi === 'true' || hien_thi === 1);
+    }
 
-    await slide.save();
-    res.json({ message: 'Cập nhật ảnh slide thành công', data: slide });
+    await AnhSlide.update(updateData, { where: { id: id } });
+    
+    const updated = await AnhSlide.findByPk(id);
+    return res.json({ message: 'Cập nhật thành công', data: updated });
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi server', error: error.message });
+    console.error('❌ Lỗi PUT /api/anh-slide:', error.message);
+    return res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
 });
 

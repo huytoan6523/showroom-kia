@@ -7,10 +7,13 @@ const API_BASE = '/api';
 async function apiFetch(path) {
   try {
     const res = await fetch(API_BASE + path);
+    if (!res.ok) return null;
     const json = await res.json();
-    return json.data ?? json;
-  } catch {
-    return null;
+    // Bóc tách mảng dữ liệu từ { message: '...', data: [...] }
+    return json.data || (Array.isArray(json) ? json : []);
+  } catch (err) {
+    console.error('apiFetch error:', err);
+    return [];
   }
 }
 
