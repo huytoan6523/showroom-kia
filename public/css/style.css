@@ -1771,27 +1771,23 @@ select.popup-input {
 
 .version-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px dashed rgba(0,0,0,0.1);
-}
-
-.version-item:last-child {
-  border-bottom: none;
+  justify-content: flex-start;
+  align-items: baseline;
+  padding: 4px 0;
+  gap: 8px; /* Khoảng cách sát nhau */
 }
 
 .version-name {
-  font-weight: 500;
+  font-weight: 400;
   color: var(--black);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
 }
 
 .version-price {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--primary);
   font-family: inherit;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
 }
 
 /* HERO SLIDER */
