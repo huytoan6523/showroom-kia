@@ -334,6 +334,19 @@
         </div>
       `).join('');
 
+      // Cập nhật kích thước tỷ lệ (aspect-ratio) theo ảnh đầu tiên
+      const firstImg = track.querySelector('img');
+      if (firstImg) {
+        const setAspect = () => {
+          if (firstImg.naturalWidth && firstImg.naturalHeight) {
+            const ratio = firstImg.naturalWidth / firstImg.naturalHeight;
+            document.getElementById('hero-slider-section').style.aspectRatio = ratio;
+          }
+        };
+        firstImg.onload = setAspect;
+        if (firstImg.complete) setAspect();
+      }
+
       startHeroAutoSlide();
     }
 

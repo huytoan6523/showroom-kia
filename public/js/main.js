@@ -109,6 +109,28 @@ async function loadFooter() {
       </div>
       <div class="footer-copy">© ${new Date().getFullYear()} ${data.ten_cong_ty || 'KIA Showroom'}. All rights reserved.</div>
     </div>`;
+
+  // Render floating buttons (Zalo & Phone) except on specific pages
+  const path = window.location.pathname;
+  const isExcluded = path.includes('/dat-lich') || path.includes('/lien-he');
+  
+  if (!isExcluded) {
+    const fabs = document.createElement('div');
+    fabs.className = 'floating-actions';
+    let html = '';
+    if (data.zalo) {
+      const zaloPhone = data.zalo.replace(/[^0-9]/g, '');
+      html += `<a href="https://zalo.me/${zaloPhone}" target="_blank" class="fab btn-zalo">Zalo</a>`;
+    }
+    if (data.so_dien_thoai) {
+      const phone = data.so_dien_thoai.replace(/[^0-9+]/g, '');
+      html += `<a href="tel:${phone}" class="fab btn-phone">📞</a>`;
+    }
+    if (html !== '') {
+      fabs.innerHTML = html;
+      document.body.appendChild(fabs);
+    }
+  }
 }
 
 function initScrollReveal() {
