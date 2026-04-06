@@ -1796,6 +1796,7 @@ select.popup-input {
   overflow: hidden;
   background: var(--gray-bg);
   /* The aspect-ratio will be set dynamically via JS to match the first image */
+  margin-top: calc(var(--nav-h) + 6px); /* Đẩy HERO bằng với chiều cao của NAVBAR */
 }
 
 .hero-track {
