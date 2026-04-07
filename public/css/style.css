@@ -826,6 +826,7 @@ p {
 }
 
 .car-actions {
+  margin-top: 24px;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
