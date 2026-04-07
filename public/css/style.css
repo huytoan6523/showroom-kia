@@ -164,7 +164,8 @@ p {
   top: 0;
   z-index: 999;
   height: auto;
-  padding-top: 4px; /* Mặc định cho di động */
+  padding-top: 4px;
+  /* Mặc định cho di động */
   background: var(--white);
   border-bottom: 1px solid var(--gray-line);
   transition: all var(--transition);
@@ -172,7 +173,8 @@ p {
 
 @media (min-width: 768px) {
   #navbar {
-    padding-top: 6px; /* Cách mép cho máy tính trông sang hơn */
+    padding-top: 6px;
+    /* Cách mép cho máy tính trông sang hơn */
   }
 }
 
@@ -342,13 +344,15 @@ p {
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 100px 0 80px; /* Tăng padding trên để bù cho Navbar */
+  padding: 100px 0 80px;
+  /* Tăng padding trên để bù cho Navbar */
 }
 
 @media (max-width: 768px) {
   .hero {
     min-height: auto;
-    padding: 120px 0 80px; /* Thêm padding top để bù cho Navbar lửng */
+    padding: 120px 0 80px;
+    /* Thêm padding top để bù cho Navbar lửng */
   }
 }
 
@@ -403,17 +407,20 @@ p {
 .hero-actions {
   display: flex;
   gap: 12px;
-  flex-wrap: nowrap; /* Luôn giữ 1 dòng */
+  flex-wrap: nowrap;
+  /* Luôn giữ 1 dòng */
 }
 
 @media (max-width: 480px) {
   .hero-actions {
     gap: 8px;
   }
+
   .hero-actions .btn {
     padding: 10px 16px;
     font-size: 0.8rem;
-    flex: 1; /* Cho phép các nút chia đều không gian */
+    flex: 1;
+    /* Cho phép các nút chia đều không gian */
     text-align: center;
     white-space: nowrap;
   }
@@ -822,7 +829,7 @@ p {
 
 .version-price {
   font-weight: 600;
-  color: var(--red);
+  color: red;
   text-transform: none;
 }
 
@@ -1684,14 +1691,14 @@ select.popup-input {
   box-shadow: var(--shadow-sm);
 }
 
-.rich-text-content h2, 
-.rich-text-content h3, 
+.rich-text-content h2,
+.rich-text-content h3,
 .rich-text-content h4 {
   margin: 2rem 0 1rem;
   color: var(--black);
 }
 
-.rich-text-content ul, 
+.rich-text-content ul,
 .rich-text-content ol {
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
@@ -1747,7 +1754,7 @@ select.popup-input {
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  
+
   .car-price {
     font-size: 1.5rem;
   }
@@ -1777,7 +1784,8 @@ select.popup-input {
   justify-content: flex-start;
   align-items: baseline;
   padding: 4px 0;
-  gap: 8px; /* Khoảng cách sát nhau */
+  gap: 8px;
+  /* Khoảng cách sát nhau */
 }
 
 .version-name {
@@ -1800,7 +1808,8 @@ select.popup-input {
   overflow: hidden;
   background: var(--gray-bg);
   /* The aspect-ratio will be set dynamically via JS to match the first image */
-  margin-top: calc(var(--nav-h) + 6px); /* Đẩy HERO bằng với chiều cao của NAVBAR */
+  margin-top: calc(var(--nav-h) + 6px);
+  /* Đẩy HERO bằng với chiều cao của NAVBAR */
 }
 
 .hero-track {
@@ -1838,7 +1847,7 @@ select.popup-input {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1850,7 +1859,7 @@ select.popup-input {
 
 .fab:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   color: white;
 }
 
@@ -1864,4 +1873,3 @@ select.popup-input {
 .btn-phone {
   background: var(--red);
 }
-
