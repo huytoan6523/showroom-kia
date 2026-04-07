@@ -137,15 +137,13 @@
             
             ${xe.mo_ta_ngan ? `<div class="car-short-desc">${xe.mo_ta_ngan}</div>` : ''}
 
+            ${xe.giam_gia_max ? `
             <div class="car-price-block">
-              <div class="car-price-label">Giá bán lẻ đề xuất</div>
-              <div class="car-price">${priceText}</div>
-              ${xe.giam_gia_max ? `
-                <div class="car-promo">
-                  <span class="promo-tag">Ưu đãi</span>
-                  Ưu đãi lên đến <strong>${formatMoney(xe.giam_gia_max)}</strong>
-                </div>` : ''}
-            </div>
+              <div class="car-promo">
+                <span class="promo-tag">Ưu đãi</span>
+                Ưu đãi lên đến <strong>${formatMoney(xe.giam_gia_max)}</strong>
+              </div>
+            </div>` : ''}
 
             ${versionsHTML}
 
