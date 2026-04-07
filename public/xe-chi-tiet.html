@@ -93,10 +93,10 @@
       const versionsHTML = versions.length
         ? `<div class="versions-section">
             <h4>Phiên bản &amp; giá</h4>
-            <div class="version-list">
+            <div class="versions-list">
               ${versions.map(v => `
-                <div class="version-item">
-                  <span class="version-name">${v.ten_phien_ban}:</span>
+                <div class="version-row">
+                  <span class="version-name">${v.ten_phien_ban}</span>
                   <span class="version-price">${formatMoney(v.gia)}</span>
                 </div>`).join('')}
             </div>
