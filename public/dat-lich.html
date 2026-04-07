@@ -77,7 +77,7 @@
           <a href="/san-pham" class="nav-link">Sản phẩm</a>
           <a href="/tin-tuc" class="nav-link">Tin tức</a>
           <a href="/lien-he" class="nav-link">Liên hệ</a>
-          <a href="/dat-lich" class="nav-cta">Đặt lịch lái thử</a>
+          <a href="/dat-lich" class="nav-cta">Báo giá lăn bánh</a>
         </div>
         <button id="nav-toggle" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -92,9 +92,9 @@
       <div class="breadcrumb">
         <a href="/">Trang chủ</a>
         <span>/</span>
-        <span>Đặt lịch lái thử</span>
+        <span>Báo giá</span>
       </div>
-      <h1>Đặt lịch lái thử</h1>
+      <h1>Báo giá lăn bánh</h1>
       <p>Trải nghiệm xe KIA miễn phí tại showroom — không ràng buộc, không mất phí.</p>
     </div>
   </div>
@@ -106,7 +106,7 @@
 
         <!-- form card -->
         <div class="form-card reveal">
-          <h2 style="margin-bottom:8px">Thông tin đặt lịch</h2>
+          <h2 style="margin-bottom:8px">Thông tin liên hệ</h2>
           <p style="margin-bottom:28px">Điền đầy đủ thông tin bên dưới, chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.
           </p>
 
@@ -140,11 +140,6 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="ngay_hen">Ngày hẹn <span class="req">*</span></label>
-              <input type="date" id="ngay_hen" class="form-control">
-              <div class="field-err" id="err-ngay_hen">Vui lòng chọn ngày hẹn hợp lệ.</div>
-            </div>
 
             <div class="form-group">
               <label class="form-label" for="ghi_chu">Ghi chú</label>
@@ -152,7 +147,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%;justify-content:center">
-              Xác nhận đặt lịch
+              Nhận báo giá
             </button>
           </form>
         </div>
@@ -199,9 +194,7 @@
     const xeParam = getParam('xe');
     if (xeParam) document.getElementById('xe_quan_tam').value = xeParam;
 
-    /* min date = today */
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('ngay_hen').min = today;
 
     /* load showroom contact for sidebar */
     (async function loadSidebarContact() {
@@ -252,8 +245,6 @@
       const email = document.getElementById('email').value.trim();
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showFieldError('email', 'err-email'); ok = false; }
 
-      const ngay = document.getElementById('ngay_hen').value;
-      if (!ngay || ngay < today) { showFieldError('ngay_hen', 'err-ngay_hen'); ok = false; }
 
       return ok;
     }
@@ -274,25 +265,25 @@
         so_dien_thoai: document.getElementById('so_dien_thoai').value.trim(),
         email: document.getElementById('email').value.trim() || undefined,
         xe_quan_tam: document.getElementById('xe_quan_tam').value.trim() || undefined,
-        ngay_hen: document.getElementById('ngay_hen').value,
+        ngay_hen: today,
         ghi_chu: document.getElementById('ghi_chu').value.trim() || undefined,
       };
 
       const result = await apiPost('/dat-lich', payload);
 
       btn.disabled = false;
-      btn.textContent = 'Xác nhận đặt lịch';
+      btn.textContent = 'Nhận báo giá';
 
       if (result && (result.data || result.message)) {
         notice.className = 'form-notice success';
-        notice.textContent = '✅ Đặt lịch thành công! Chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ.';
+        notice.textContent = '✅ Đã gửi yêu cầu! Chúng tôi sẽ liên hệ báo giá trong vòng 2 giờ.';
         notice.style.display = 'block';
         this.reset();
         if (xeParam) document.getElementById('xe_quan_tam').value = xeParam;
         window.scrollTo({ top: notice.offsetTop - 100, behavior: 'smooth' });
       } else {
         notice.className = 'form-notice error';
-        notice.textContent = '❌ Đặt lịch thất bại. Vui lòng thử lại hoặc liên hệ trực tiếp.';
+        notice.textContent = '❌ Gửi thất bại. Vui lòng thử lại hoặc liên hệ trực tiếp.';
         notice.style.display = 'block';
       }
     });

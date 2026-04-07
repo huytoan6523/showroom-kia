@@ -829,7 +829,7 @@ p {
 
 .version-price {
   font-weight: 600;
-  color: red;
+  color: var(--red);
   text-transform: none;
 }
 
