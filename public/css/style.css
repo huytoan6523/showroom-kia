@@ -1796,7 +1796,7 @@ select.popup-input {
 
 .version-price {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--red);
   font-family: inherit;
   font-size: 1.1rem;
 }
